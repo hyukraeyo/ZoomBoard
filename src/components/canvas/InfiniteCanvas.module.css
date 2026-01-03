@@ -1,0 +1,51 @@
+.canvasContainer {
+  width: 100vw;
+  height: 100vh;
+  background-color: var(--bg-secondary);
+  background-image: 
+    linear-gradient(var(--canvas-grid) 1px, transparent 1px),
+    linear-gradient(90deg, var(--canvas-grid) 1px, transparent 1px);
+  /* Dynamic Grid Logic */
+  background-size: calc(40px * var(--scale, 1)) calc(40px * var(--scale, 1));
+  background-position: var(--x, 0)px var(--y, 0)px;
+  overflow: hidden;
+  position: relative;
+  will-change: background-position, background-size; /* Usage hint for browser */
+}
+
+.canvasContent {
+  /* No background here, it's on the container to be infinite */
+}
+
+.controls {
+  position: fixed;
+  bottom: 2rem;
+  right: 2rem;
+  display: flex;
+  gap: 0.5rem;
+  background: var(--bg-primary);
+  padding: 0.5rem;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  border: 1px solid var(--border-primary);
+  z-index: 50;
+}
+
+.button {
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  background: transparent;
+  color: var(--text-secondary);
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.button:hover {
+  background: var(--bg-secondary);
+  color: var(--text-primary);
+}
