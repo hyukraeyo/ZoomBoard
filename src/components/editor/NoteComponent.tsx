@@ -5,8 +5,8 @@ import StarterKit from '@tiptap/starter-kit';
 import Placeholder from '@tiptap/extension-placeholder';
 import styles from './Editor.module.css';
 import { useNoteStore, Note } from '@/store/useNoteStore';
-import { useEffect, useRef, useState } from 'react';
-import Draggable from 'react-draggable';
+import { useRef } from 'react';
+import Draggable, { DraggableEvent } from 'react-draggable';
 
 const extensions = [
     StarterKit,
@@ -40,7 +40,7 @@ export default function NoteComponent({ note, scale }: NoteComponentProps) {
     });
 
     // Handle Drag Stop
-    const handleStop = (e: any, data: { x: number; y: number }) => {
+    const handleStop = (e: DraggableEvent, data: { x: number; y: number }) => {
         updateNote(note.id, { x: data.x, y: data.y });
     };
 

@@ -43,3 +43,7 @@ Your goal is to build the most performant, accessible, and visually stunning web
 - **Visuals First**: When generating UI, always aim for "WOW" factor. No boring layouts.
 - **Error Handling**: Always implement Error Boundaries (`error.tsx`) for route segments.
 - **Clean Code**: Remove unused imports, console logs, and comments immediately.
+
+# Git & Workflow Rules
+- **Commit Messages**: MUST be written in Korean (한글).
+- **Pre-Push Check**: MUST run `npm run lint` and `npm run build` and resolve ALL errors/warnings before pushing to remote.

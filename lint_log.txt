@@ -1,0 +1,20 @@
+
+> next-expert-app@0.1.0 lint
+> eslint
+
+
+C:\Users\johr9\Documents\git\ETC\src\components\canvas\InfiniteCanvas.tsx
+    5:45  warning  'MousePointer2' is defined but never used                                                                            @typescript-eslint/no-unused-vars
+   10:11  warning  'InfiniteCanvasProps' is defined but never used                                                                      @typescript-eslint/no-unused-vars
+   28:9   error    Use "@ts-expect-error" instead of "@ts-ignore", as "@ts-ignore" will do nothing if the following line is error-free  @typescript-eslint/ban-ts-comment
+   36:9   error    Use "@ts-expect-error" instead of "@ts-ignore", as "@ts-ignore" will do nothing if the following line is error-free  @typescript-eslint/ban-ts-comment
+  131:38  warning  'resetTransform' is defined but never used                                                                           @typescript-eslint/no-unused-vars
+  131:54  warning  'centerView' is defined but never used                                                                               @typescript-eslint/no-unused-vars
+
+C:\Users\johr9\Documents\git\ETC\src\components\editor\NoteComponent.tsx
+   8:10  warning  'useEffect' is defined but never used     @typescript-eslint/no-unused-vars
+   8:29  warning  'useState' is defined but never used      @typescript-eslint/no-unused-vars
+  43:28  error    Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+✖ 9 problems (3 errors, 6 warnings)
+

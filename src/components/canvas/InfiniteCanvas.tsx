@@ -2,14 +2,10 @@
 
 import { TransformWrapper, TransformComponent, ReactZoomPanPinchContentRef } from 'react-zoom-pan-pinch';
 import { useRef, useState } from 'react';
-import { Minus, Plus, Maximize, StickyNote, MousePointer2 } from 'lucide-react';
+import { Minus, Plus, Maximize, StickyNote } from 'lucide-react';
 import styles from './InfiniteCanvas.module.css';
 import { useNoteStore } from '@/store/useNoteStore';
 import NoteComponent from '@/components/editor/NoteComponent';
-
-interface InfiniteCanvasProps {
-    children?: React.ReactNode; // Optional now as we map notes
-}
 
 export default function InfiniteCanvas() {
     const transformComponentRef = useRef<ReactZoomPanPinchContentRef | null>(null);
@@ -25,7 +21,7 @@ export default function InfiniteCanvas() {
         if (!isPlacementMode) return;
 
         // Robust check: Ensure we aren't clicking on a note or UI control
-        // @ts-ignore
+        // @ts-expect-error: closest is guaranteed in DOM environment
         if (e.target.closest && (e.target.closest('.note-item') || e.target.closest('button'))) return;
 
         if (!transformComponentRef.current) return;
@@ -33,7 +29,7 @@ export default function InfiniteCanvas() {
         // Correctly access state from the instance
         const wrapper = transformComponentRef.current.instance.wrapperComponent;
         // Try to get state from instance or fallback (some versions differ)
-        // @ts-ignore - access internal state safely
+        // @ts-expect-error: access internal state safely
         const transformState = transformComponentRef.current.instance.transformState || transformComponentRef.current.state;
 
         if (!wrapper || !transformState) return;
@@ -128,7 +124,7 @@ export default function InfiniteCanvas() {
                 disabled={isPlacementMode} // Disable pan/zoom when placing a note
                 panning={{ excluded: ['react-draggable', 'drag-handle-class'] }} // Prevent panning when dragging items
             >
-                {({ zoomIn, zoomOut, resetTransform, centerView }) => (
+                {({ zoomIn, zoomOut }) => (
                     <>
                         {/* Controls ... */}
                         <div className={styles.controls}>
