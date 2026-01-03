@@ -1,7 +1,7 @@
 'use client';
 
 import { TransformWrapper, TransformComponent, ReactZoomPanPinchContentRef } from 'react-zoom-pan-pinch';
-import { useRef, useState } from 'react';
+import { useRef, useState, useEffect } from 'react';
 import { Minus, Plus, Maximize, StickyNote } from 'lucide-react';
 import styles from './InfiniteCanvas.module.css';
 import { useNoteStore } from '@/store/useNoteStore';
@@ -10,9 +10,13 @@ import NoteComponent from '@/components/editor/NoteComponent';
 export default function InfiniteCanvas() {
     const transformComponentRef = useRef<ReactZoomPanPinchContentRef | null>(null);
     const containerRef = useRef<HTMLDivElement>(null);
-    const { notes, addNote } = useNoteStore();
+    const { notes, addNote, fetchNotes } = useNoteStore();
     const [currentScale, setCurrentScale] = useState(1);
     const [isPlacementMode, setIsPlacementMode] = useState(false);
+
+    useEffect(() => {
+        fetchNotes();
+    }, [fetchNotes]);
 
     const canvasSize = 10000;
 

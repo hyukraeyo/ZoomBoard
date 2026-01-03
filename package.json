@@ -1,16 +1,34 @@
 {
-  "name": "next-expert-app",
+  "name": "zoom-board",
   "version": "0.1.0",
   "private": true,
   "scripts": {
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "supa:link": "supabase link --project-ref wheludimqxsytugbqnna",
+    "supa:push": "supabase db push"
   },
   "dependencies": {
     "@ducanh2912/next-pwa": "^10.2.9",
+    "@supabase/supabase-js": "^2.89.0",
+    "@tiptap/extension-blockquote": "^3.14.0",
+    "@tiptap/extension-bold": "^3.14.0",
+    "@tiptap/extension-bullet-list": "^3.14.0",
+    "@tiptap/extension-code-block": "^3.14.0",
+    "@tiptap/extension-document": "^3.14.0",
+    "@tiptap/extension-dropcursor": "^3.14.0",
+    "@tiptap/extension-heading": "^3.14.0",
+    "@tiptap/extension-history": "^3.14.0",
+    "@tiptap/extension-image": "^3.14.0",
+    "@tiptap/extension-italic": "^3.14.0",
+    "@tiptap/extension-list-item": "^3.14.0",
+    "@tiptap/extension-ordered-list": "^3.14.0",
+    "@tiptap/extension-paragraph": "^3.14.0",
     "@tiptap/extension-placeholder": "^3.14.0",
+    "@tiptap/extension-strike": "^3.14.0",
+    "@tiptap/extension-text": "^3.14.0",
     "@tiptap/react": "^3.14.0",
     "@tiptap/starter-kit": "^3.14.0",
     "lucide-react": "^0.562.0",
@@ -26,9 +44,11 @@
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
+    "@types/uuid": "^10.0.0",
     "babel-plugin-react-compiler": "1.0.0",
     "eslint": "^9",
     "eslint-config-next": "16.1.1",
+    "supabase": "^2.70.5",
     "typescript": "^5"
   }
 }
