@@ -30,7 +30,7 @@ interface NoteState {
     isLoading: boolean;
     fetchNotes: () => Promise<void>;
     fetchTrashNotes: () => Promise<void>;
-    addNote: (x: number, y: number) => Promise<void>;
+    addNote: (x: number, y: number) => Promise<string>;
     updateNote: (id: string, updates: Partial<Note>) => Promise<void>;
     deleteNote: (id: string) => Promise<void>; // Soft delete
     restoreNote: (id: string) => Promise<void>;
@@ -38,8 +38,7 @@ interface NoteState {
     bringToFront: (id: string) => Promise<void>;
     focusedNoteId: string | null;
     setFocusedNoteId: (id: string | null) => void;
-    viewport: { x: number; y: number; scale: number; width: number; height: number };
-    setViewport: (v: { x: number; y: number; scale: number; width: number; height: number }) => void;
+
     isSidebarOpen: boolean;
     setIsSidebarOpen: (isOpen: boolean) => void;
     isLocked: boolean;
@@ -146,6 +145,8 @@ export const useNoteStore = create<NoteState>()(
                     console.error('Error adding note:', JSON.stringify(error, null, 2));
                     // Rollback could be added here
                 }
+
+                return newNote.id;
             },
 
             updateNote: async (id, updates) => {
@@ -267,8 +268,7 @@ export const useNoteStore = create<NoteState>()(
 
             focusedNoteId: null,
             setFocusedNoteId: (id) => set({ focusedNoteId: id }),
-            viewport: { x: 0, y: 0, scale: 1, width: 0, height: 0 },
-            setViewport: (v) => set({ viewport: v }),
+
 
             setIsSidebarOpen: (isOpen) => set({ isSidebarOpen: isOpen }),
             setIsLocked: (isLocked) => set({ isLocked: isLocked }),
@@ -278,7 +278,7 @@ export const useNoteStore = create<NoteState>()(
             partialize: (state) => ({
                 isSidebarOpen: state.isSidebarOpen,
                 isLocked: state.isLocked,
-                viewport: state.viewport,
+
                 // optionally persist focused note? user said "unconditionally", let's do it.
                 focusedNoteId: state.focusedNoteId
             }),

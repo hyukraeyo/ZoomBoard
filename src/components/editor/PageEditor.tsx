@@ -15,11 +15,10 @@ import Blockquote from '@tiptap/extension-blockquote';
 import History from '@tiptap/extension-history';
 import Placeholder from '@tiptap/extension-placeholder';
 import Dropcursor from '@tiptap/extension-dropcursor';
-import styles from './Editor.module.css';
+import styles from './PageEditor.module.css';
 import { useNoteStore, Note } from '@/store/useNoteStore';
-import { useRef } from 'react';
-import Draggable, { DraggableEvent, DraggableData } from 'react-draggable';
 import { useEditor, EditorContent } from '@tiptap/react';
+import { useEffect } from 'react';
 
 const extensions = [
     Document,
@@ -39,21 +38,19 @@ const extensions = [
     Placeholder.configure({
         placeholder: ({ node }) => {
             if (node.type.name === 'heading' && node.attrs.level === 1) {
-                return '새 페이지';
+                return '제목 없음';
             }
             return "내용을 입력하거나 '/'를 눌러 명령어를 사용하세요...";
         },
     }),
 ];
 
-interface NoteComponentProps {
+interface PageEditorProps {
     note: Note;
-    scale: number;
 }
 
-export default function NoteComponent({ note, scale }: NoteComponentProps) {
-    const { updateNote, bringToFront, setFocusedNoteId } = useNoteStore();
-    const nodeRef = useRef<HTMLDivElement>(null);
+export default function PageEditor({ note }: PageEditorProps) {
+    const { updateNote } = useNoteStore();
 
     // Initialize content with title if content is empty (Migration helper)
     const initialContent = note.content || (note.title ? `<h1>${note.title}</h1>` : '');
@@ -82,44 +79,33 @@ export default function NoteComponent({ note, scale }: NoteComponentProps) {
                 title: title
             });
         },
+        // We generally want immediatelyRender: false for SSR frameworks to match hydration
         immediatelyRender: false,
     });
 
-    // Handle Drag Stop
-    const handleStop = (e: DraggableEvent, data: DraggableData) => {
-        updateNote(note.id, { x: data.x, y: data.y });
-    };
+    // Update editor content if note changes externally (e.g. from a fresh fetch or another source)
+    // Be careful not to create infinite loops or reset cursor position while typing
+    // For now, only update if the editor is empty or on mount.
+    // Complex real-time collaboration needs Y.js, but for local-first single user:
+    useEffect(() => {
+        if (editor && note.content && editor.getHTML() !== note.content) {
+            // Only update if completely different? 
+            // Actually, with local state, we rely on onUpdate to push changes.
+            // We shouldn't pull changes back unless we implement Undo/Redo via store or something.
+            // But if we switch notes, the component remounts, so new content is loaded via initialContent.
+            // So this useEffect might not be needed if key={note.id} is used on the parent.
+        }
+    }, [note.id, editor]);
+
+    if (!editor) {
+        return null;
+    }
 
     return (
-        <Draggable
-            nodeRef={nodeRef}
-            handle={`.${styles.dragHandle}`}
-            defaultPosition={{ x: note.x, y: note.y }}
-            onStart={() => {
-                bringToFront(note.id);
-                setFocusedNoteId(note.id);
-            }}
-            onStop={handleStop}
-            scale={scale}
-        >
-            <div
-                ref={nodeRef}
-                className={`${styles.noteContainer} note-item`}
-                style={{ zIndex: note.zIndex || 1 }}
-                onMouseDownCapture={() => {
-                    bringToFront(note.id);
-                    setFocusedNoteId(note.id);
-                }}
-            >
-                <div className={styles.editorWrapper} onClick={() => {
-                    bringToFront(note.id);
-                    setFocusedNoteId(note.id);
-                    editor?.chain().focus().run();
-                }}>
-                    <div className={`${styles.dragHandle} drag-handle-class`} title="Drag to move" />
-                    <EditorContent editor={editor} />
-                </div>
+        <div className={styles.pageContainer}>
+            <div className={styles.editorWrapper} onClick={() => editor.chain().focus().run()}>
+                <EditorContent editor={editor} />
             </div>
-        </Draggable>
+        </div>
     );
 }

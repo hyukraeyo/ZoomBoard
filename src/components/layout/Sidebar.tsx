@@ -4,6 +4,7 @@ import { useNoteStore } from '@/store/useNoteStore';
 import styles from './Sidebar.module.css';
 import { FileText, Plus, Search, Home, Settings, MoreHorizontal, Trash2, Menu, ChevronsLeft, ChevronsRight } from 'lucide-react';
 import { useMemo, useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 import TrashPopover from './TrashPopover';
 
 export default function Sidebar() {
@@ -16,8 +17,10 @@ export default function Sidebar() {
         isSidebarOpen,
         setIsSidebarOpen,
         isLocked,
+
         setIsLocked
     } = useNoteStore();
+    const router = useRouter();
     const [activeMenu, setActiveMenu] = useState<{ id: string; x: number; y: number } | null>(null);
     const [trashOpen, setTrashOpen] = useState(false);
     const [trashPosition, setTrashPosition] = useState({ top: 0, left: 0 });
@@ -31,30 +34,13 @@ export default function Sidebar() {
 
     const handleNoteClick = (id: string) => {
         setFocusedNoteId(id);
+        router.push(`/notes/${id}`);
     };
 
     const handleAddPage = async (e?: React.MouseEvent) => {
         e?.stopPropagation();
-
-        // Access viewport state directly to avoid re-rendering Sidebar on every viewport change (resize)
-        const viewport = useNoteStore.getState().viewport;
-
-        // Calculate center of current view
-        // viewport.x/y is the translation of the canvas
-        // viewport.width/height is the visibility window
-        // The center of the window in canvas coordinates:
-        // center = ( (Window/2) - Translate ) / Scale
-
-        // Default to 0,0 if not yet initialized
-        let x = 0;
-        let y = 0;
-
-        if (viewport.width > 0 && viewport.scale > 0) {
-            x = ((viewport.width / 2) - viewport.x) / viewport.scale;
-            y = ((viewport.height / 2) - viewport.y) / viewport.scale;
-        }
-
-        await addNote(x, y);
+        const newNoteId = await addNote(0, 0);
+        router.push(`/notes/${newNoteId}`);
     };
 
     const openMenu = (e: React.MouseEvent, id: string) => {
@@ -199,7 +185,10 @@ export default function Sidebar() {
                     <span>홈 (Home)</span>
                 </div>
 
-                <div className={styles.sectionTitle}>개인 페이지 (Private)</div>
+                <div className={styles.sectionTitle} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', cursor: 'pointer' }} onClick={handleAddPage}>
+                    <span>개인 페이지 (Private)</span>
+                    <Plus size={14} />
+                </div>
 
                 <div className={styles.noteList}>
                     {sortedNotes.map(note => (
