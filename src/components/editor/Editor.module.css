@@ -1,16 +1,18 @@
 
 .noteContainer {
   position: absolute;
+  top: 0;
+  left: 0;
   width: 650px;
-  min-height: 200px;
-  height: fit-content;
+  height: auto;
   font-family: ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, "Apple Color Emoji", Arial, sans-serif, "Segoe UI Emoji", "Segoe UI Symbol";
 }
 
 .editorWrapper {
   width: 100%;
-  height: 100%;
-  padding: 4px 44px 32px; /* Close to Notion's side padding */
+  min-height: 200px;
+  height: auto;
+  padding: 40px 44px 32px; /* Increased top padding to avoid drag handle overlap */
   background: var(--editor-bg, #ffffff);
   box-shadow: 
     0 1px 3px 0 rgba(0, 0, 0, 0.1),
@@ -83,17 +85,17 @@
 
 /* Paragraphs */
 .content :global(p) {
-  margin: 2px 0; /* Tighter paragraph spacing typical of Notion */
+  margin: 4px 0; /* Increased from 2px for better readability */
   min-height: 1.5em; /* Maintain line height for empty paragraphs */
 }
 
 /* Headings */
 .content :global(h1) {
-  font-size: 1.875em;
+  font-size: 2.25em; /* Increased size to match screenshot */
   font-weight: 700;
   line-height: 1.2;
-  margin-top: 2em;
-  margin-bottom: 4px;
+  margin-top: 1.5em;
+  margin-bottom: 6px;
 }
 
 .content :global(h1:first-child) {
@@ -104,16 +106,16 @@
   font-size: 1.5em;
   font-weight: 600;
   line-height: 1.3;
-  margin-top: 1.4em;
-  margin-bottom: 1px;
+  margin-top: 1.6em;
+  margin-bottom: 4px;
 }
 
 .content :global(h3) {
   font-size: 1.25em;
   font-weight: 600;
   line-height: 1.3;
-  margin-top: 1em;
-  margin-bottom: 1px;
+  margin-top: 1.2em;
+  margin-bottom: 2px;
 }
 
 /* Lists */

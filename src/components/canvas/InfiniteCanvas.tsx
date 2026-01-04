@@ -7,16 +7,70 @@ import styles from './InfiniteCanvas.module.css';
 import { useNoteStore } from '@/store/useNoteStore';
 import NoteComponent from '@/components/editor/NoteComponent';
 
+interface CustomZoomRef {
+    state: {
+        scale: number;
+        positionX: number;
+        positionY: number;
+    };
+    instance: {
+        wrapperComponent: HTMLElement | null;
+    };
+}
+
 export default function InfiniteCanvas() {
     const transformComponentRef = useRef<ReactZoomPanPinchContentRef | null>(null);
     const containerRef = useRef<HTMLDivElement>(null);
-    const { notes, addNote, fetchNotes } = useNoteStore();
+
+    // Optimize selectors to prevent re-renders when viewport updates
+    const notes = useNoteStore(state => state.notes);
+    const addNote = useNoteStore(state => state.addNote);
+    const fetchNotes = useNoteStore(state => state.fetchNotes);
+    const focusedNoteId = useNoteStore(state => state.focusedNoteId);
+    const setViewport = useNoteStore(state => state.setViewport);
+
     const [currentScale, setCurrentScale] = useState(1);
     const [isPlacementMode, setIsPlacementMode] = useState(false);
+    const [isPanning, setIsPanning] = useState(false);
 
     useEffect(() => {
         fetchNotes();
     }, [fetchNotes]);
+
+    const handleTransformUpdate = (ref: CustomZoomRef) => {
+        const { scale, positionX, positionY } = ref.state;
+        const wrapper = ref.instance.wrapperComponent;
+        if (wrapper) {
+            const { width, height } = wrapper.getBoundingClientRect();
+            setViewport({ x: positionX, y: positionY, scale, width, height });
+            setCurrentScale(scale);
+            updateBackground(scale, positionX, positionY);
+        }
+    };
+
+    useEffect(() => {
+        if (!focusedNoteId || !transformComponentRef.current) return;
+
+        const note = notes.find(n => n.id === focusedNoteId);
+        if (!note) return;
+
+        // Center visual calculation
+        // Note width ~ 650px, Height varies (assume ~200px or top-anchored)
+        // We want to center the top-center of the note or the whole note
+        const noteCenterX = note.x + 325; // Half of 650
+        const noteCenterY = note.y + 150; // Some offset
+
+        const wrapper = transformComponentRef.current.instance.wrapperComponent;
+        if (!wrapper) return;
+        const { width, height } = wrapper.getBoundingClientRect();
+
+        const targetScale = 1;
+
+        const targetX = (width / 2) - (noteCenterX * targetScale);
+        const targetY = (height / 2) - (noteCenterY * targetScale);
+
+        transformComponentRef.current.setTransform(targetX, targetY, targetScale, 1000, "easeOutQuad"); // Smooth animation
+    }, [focusedNoteId, notes]);
 
     const canvasSize = 10000;
 
@@ -52,6 +106,8 @@ export default function InfiniteCanvas() {
         setIsPlacementMode(false);
     };
 
+
+
     const updateBackground = (scale: number, x: number, y: number) => {
         if (containerRef.current) {
             containerRef.current.style.setProperty('--scale', scale.toString());
@@ -59,6 +115,14 @@ export default function InfiniteCanvas() {
             containerRef.current.style.setProperty('--y', y.toString());
         }
     };
+
+    // Initialize background on mount
+    useEffect(() => {
+        if (transformComponentRef.current) {
+            const { scale, positionX, positionY } = transformComponentRef.current.instance.transformState;
+            updateBackground(scale, positionX, positionY);
+        }
+    }, []);
 
     const handleFitToView = () => {
         if (notes.length === 0 || !transformComponentRef.current) {
@@ -105,7 +169,9 @@ export default function InfiniteCanvas() {
         <div
             ref={containerRef}
             className={styles.canvasContainer}
-            style={{ cursor: isPlacementMode ? 'crosshair' : 'default' }}
+            style={{
+                cursor: isPlacementMode ? 'crosshair' : (isPanning ? 'grabbing' : 'grab')
+            }}
             onClick={handleCanvasClick}
         >
             <TransformWrapper
@@ -116,13 +182,12 @@ export default function InfiniteCanvas() {
                 centerOnInit={true}
                 limitToBounds={false}
                 wheel={{ step: 0.1, smoothStep: 0.002 }}
-                onTransformed={(ref) => {
-                    setCurrentScale(ref.state.scale);
-                    updateBackground(ref.state.scale, ref.state.positionX, ref.state.positionY);
-                }}
+                onTransformed={handleTransformUpdate}
+                onPanningStart={() => setIsPanning(true)}
+                onPanningStop={() => setIsPanning(false)}
                 onInit={(ref) => {
                     setTimeout(() => ref.centerView(1, 0), 50);
-                    updateBackground(1, 0, 0); // Initial check
+                    handleTransformUpdate(ref);
                 }}
                 doubleClick={{ disabled: true }}
                 disabled={isPlacementMode} // Disable pan/zoom when placing a note

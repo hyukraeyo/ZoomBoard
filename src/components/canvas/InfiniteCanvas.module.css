@@ -10,7 +10,7 @@
   background-position: var(--x, 0)px var(--y, 0)px;
   overflow: hidden;
   position: relative;
-  will-change: background-position, background-size; /* Usage hint for browser */
+  will-change: background-position, background-size;
 }
 
 .canvasContent {

@@ -18,7 +18,7 @@ import Dropcursor from '@tiptap/extension-dropcursor';
 import styles from './Editor.module.css';
 import { useNoteStore, Note } from '@/store/useNoteStore';
 import { useRef } from 'react';
-import Draggable, { DraggableEvent } from 'react-draggable';
+import Draggable, { DraggableEvent, DraggableData } from 'react-draggable';
 import { useEditor, EditorContent } from '@tiptap/react';
 
 const extensions = [
@@ -38,10 +38,10 @@ const extensions = [
     Dropcursor,
     Placeholder.configure({
         placeholder: ({ node }) => {
-            if (node.type.name === 'heading') {
-                return 'Untitled';
+            if (node.type.name === 'heading' && node.attrs.level === 1) {
+                return '새 페이지';
             }
-            return "Type '/' for commands...";
+            return "내용을 입력하거나 '/'를 눌러 명령어를 사용하세요...";
         },
     }),
 ];
@@ -53,12 +53,9 @@ interface NoteComponentProps {
 
 export default function NoteComponent({ note, scale }: NoteComponentProps) {
     const { updateNote, bringToFront } = useNoteStore();
-    const nodeRef = useRef(null);
+    const nodeRef = useRef<HTMLDivElement>(null);
 
     // Initialize content with title if content is empty (Migration helper)
-    // If content exists, we assume it's valid HTML.
-    // Ideally, we'd parse content, check if first node is H1. If not, prepend. 
-    // But for simplicity/safety, we only merge if content appears empty or is just a paragraph.
     const initialContent = note.content || (note.title ? `<h1>${note.title}</h1>` : '');
 
     const editor = useEditor({
@@ -76,7 +73,7 @@ export default function NoteComponent({ note, scale }: NoteComponentProps) {
             if (json.content && json.content.length > 0) {
                 const firstNode = json.content[0];
                 if (firstNode.content && firstNode.content.length > 0) {
-                    title = firstNode.content[0].text || '';
+                    title = (firstNode.content[0] as { text?: string }).text || '';
                 }
             }
 
@@ -89,7 +86,7 @@ export default function NoteComponent({ note, scale }: NoteComponentProps) {
     });
 
     // Handle Drag Stop
-    const handleStop = (e: DraggableEvent, data: { x: number; y: number }) => {
+    const handleStop = (e: DraggableEvent, data: DraggableData) => {
         updateNote(note.id, { x: data.x, y: data.y });
     };
 
@@ -98,7 +95,7 @@ export default function NoteComponent({ note, scale }: NoteComponentProps) {
             nodeRef={nodeRef}
             handle={`.${styles.dragHandle}`}
             defaultPosition={{ x: note.x, y: note.y }}
-            onStart={() => bringToFront(note.id)}
+            onStart={() => { bringToFront(note.id); }}
             onStop={handleStop}
             scale={scale}
         >
@@ -113,7 +110,6 @@ export default function NoteComponent({ note, scale }: NoteComponentProps) {
                     editor?.chain().focus().run();
                 }}>
                     <div className={`${styles.dragHandle} drag-handle-class`} title="Drag to move" />
-                    {/* Title Input Removed - using Editor H1 instead */}
                     <EditorContent editor={editor} />
                 </div>
             </div>
