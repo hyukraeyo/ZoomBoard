@@ -180,7 +180,7 @@ export default function Sidebar() {
                     <Search size={16} className={styles.icon} />
                     <span>검색 (Search)</span>
                 </div>
-                <div className={styles.noteItem}>
+                <div className={styles.noteItem} onClick={() => router.push('/')}>
                     <Home size={16} className={styles.icon} />
                     <span>홈 (Home)</span>
                 </div>

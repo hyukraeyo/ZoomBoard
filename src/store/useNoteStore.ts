@@ -11,6 +11,7 @@ export interface Note {
     createdAt: number;
     zIndex: number;
     deletedAt?: number | null;
+    isPublished?: boolean;
 }
 
 interface DBNote {
@@ -22,6 +23,7 @@ interface DBNote {
     created_at: number;
     z_index: number;
     deleted_at: number | null;
+    is_published?: boolean;
 }
 
 interface NoteState {
@@ -76,10 +78,10 @@ export const useNoteStore = create<NoteState>()(
                     y: n.y,
                     title: n.title,
                     content: n.content,
-                    // DB stores bigint (milliseconds), so just convert to Number
                     createdAt: n.created_at ? Number(n.created_at) : Date.now(),
                     zIndex: n.z_index,
                     deletedAt: n.deleted_at ? Number(n.deleted_at) : null,
+                    isPublished: n.is_published || false,
                 }));
 
                 set({ notes: formattedNotes, isLoading: false });
@@ -166,6 +168,7 @@ export const useNoteStore = create<NoteState>()(
                     created_at?: number;
                     z_index?: number;
                     deleted_at?: number | null;
+                    is_published?: boolean;
                 } = {};
                 if (updates.x !== undefined) dbUpdates.x = updates.x;
                 if (updates.y !== undefined) dbUpdates.y = updates.y;
@@ -173,6 +176,7 @@ export const useNoteStore = create<NoteState>()(
                 if (updates.content !== undefined) dbUpdates.content = updates.content;
                 if (updates.createdAt !== undefined) dbUpdates.created_at = updates.createdAt;
                 if (updates.zIndex !== undefined) dbUpdates.z_index = updates.zIndex;
+                if (updates.isPublished !== undefined) dbUpdates.is_published = updates.isPublished;
 
                 if (Object.keys(dbUpdates).length === 0) return;
 
@@ -227,10 +231,45 @@ export const useNoteStore = create<NoteState>()(
             },
 
             permanentlyDeleteNote: async (id) => {
+                const noteToDelete = get().trashNotes.find(n => n.id === id);
+
                 set((state) => ({
                     trashNotes: state.trashNotes.filter(n => n.id !== id)
                 }));
 
+                // 1. Find and delete associated images from Storage
+                if (noteToDelete && noteToDelete.content) {
+                    // Simple regex to extract image URLs from HTML content
+                    const imgRegex = /<img[^>]+src="([^">]+)"/g;
+                    let match;
+                    const filesToDelete: string[] = [];
+
+                    while ((match = imgRegex.exec(noteToDelete.content)) !== null) {
+                        const url = match[1];
+                        // Check if it's a Supabase Storage URL
+                        if (url.includes('/storage/v1/object/public/images/')) {
+                            // Extract filename (e.g., "GUID.png")
+                            const fileName = url.split('/').pop();
+                            if (fileName) {
+                                filesToDelete.push(fileName);
+                            }
+                        }
+                    }
+
+                    if (filesToDelete.length > 0) {
+                        const { error: storageError } = await supabase.storage
+                            .from('images')
+                            .remove(filesToDelete); // Bulk delete
+
+                        if (storageError) {
+                            console.error('Error deleting note images:', storageError);
+                        } else {
+                            console.log(`Deleted ${filesToDelete.length} images associated with note ${id}`);
+                        }
+                    }
+                }
+
+                // 2. Delete Note from DB
                 const { error } = await supabase
                     .from('notes')
                     .delete()
