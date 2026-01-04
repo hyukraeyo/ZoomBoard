@@ -38,10 +38,10 @@
 }
 
 .dragHandle {
-  height: 24px;
-  width: 48px;
+  height: 32px;
+  width: 150px;
   position: absolute;
-  top: 6px;
+  top: 4px; /* Slightly higher to center in padding */
   left: 50%;
   transform: translateX(-50%);
   cursor: grab;
@@ -60,10 +60,10 @@
 
 .dragHandle::after {
   content: "";
-  width: 24px;
-  height: 4px;
+  width: 40px; /* Wider visual indicator */
+  height: 5px; /* Slightly thicker */
   background: #d3d1cb;
-  border-radius: 2px;
+  border-radius: 3px;
 }
 
 .dragHandle:hover {

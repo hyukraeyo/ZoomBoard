@@ -7,12 +7,20 @@ import { useMemo, useState, useEffect } from 'react';
 import TrashPopover from './TrashPopover';
 
 export default function Sidebar() {
-    const { notes, setFocusedNoteId, focusedNoteId, addNote, deleteNote, viewport } = useNoteStore();
+    const {
+        notes,
+        setFocusedNoteId,
+        focusedNoteId,
+        addNote,
+        deleteNote,
+        isSidebarOpen,
+        setIsSidebarOpen,
+        isLocked,
+        setIsLocked
+    } = useNoteStore();
     const [activeMenu, setActiveMenu] = useState<{ id: string; x: number; y: number } | null>(null);
     const [trashOpen, setTrashOpen] = useState(false);
     const [trashPosition, setTrashPosition] = useState({ top: 0, left: 0 });
-    const [isSidebarOpen, setIsSidebarOpen] = useState(true);
-    const [isLocked, setIsLocked] = useState(true);
     const [isHoveringTrigger, setIsHoveringTrigger] = useState(false);
 
     // Sort notes by Creation time for the list (Newest first)
@@ -27,6 +35,9 @@ export default function Sidebar() {
 
     const handleAddPage = async (e?: React.MouseEvent) => {
         e?.stopPropagation();
+
+        // Access viewport state directly to avoid re-rendering Sidebar on every viewport change (resize)
+        const viewport = useNoteStore.getState().viewport;
 
         // Calculate center of current view
         // viewport.x/y is the translation of the canvas
@@ -110,11 +121,28 @@ export default function Sidebar() {
                     setIsSidebarOpen(true);
                 }}
             >
-                {isHoveringTrigger ? (
-                    <ChevronsRight size={24} color="#9f9f9f" />
-                ) : (
-                    <Menu size={24} color="#9f9f9f" />
-                )}
+                <div style={{ position: 'relative', width: 24, height: 24 }}>
+                    <div style={{
+                        position: 'absolute',
+                        top: 0,
+                        left: 0,
+                        opacity: isHoveringTrigger ? 0 : 1,
+                        transform: isHoveringTrigger ? 'scale(0.8) rotate(-90deg)' : 'scale(1) rotate(0deg)',
+                        transition: 'all 0.2s ease',
+                    }}>
+                        <Menu size={24} color="#9f9f9f" />
+                    </div>
+                    <div style={{
+                        position: 'absolute',
+                        top: 0,
+                        left: 0,
+                        opacity: isHoveringTrigger ? 1 : 0,
+                        transform: isHoveringTrigger ? 'scale(1) rotate(0deg)' : 'scale(0.8) rotate(90deg)',
+                        transition: 'all 0.2s ease',
+                    }}>
+                        <ChevronsRight size={24} color="#9f9f9f" />
+                    </div>
+                </div>
 
                 {/* Tooltip */}
                 {isHoveringTrigger && (
@@ -200,10 +228,7 @@ export default function Sidebar() {
                         </div>
                     ))}
 
-                    <div className={styles.noteItem} onClick={handleAddPage} style={{ color: '#7d7d7d' }}>
-                        <Plus size={16} className={styles.icon} />
-                        <span>페이지 추가 (Add Page)</span>
-                    </div>
+
                 </div>
 
                 <div style={{ marginTop: 24 }}></div>

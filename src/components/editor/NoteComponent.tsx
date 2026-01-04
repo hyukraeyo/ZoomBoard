@@ -52,7 +52,7 @@ interface NoteComponentProps {
 }
 
 export default function NoteComponent({ note, scale }: NoteComponentProps) {
-    const { updateNote, bringToFront } = useNoteStore();
+    const { updateNote, bringToFront, setFocusedNoteId } = useNoteStore();
     const nodeRef = useRef<HTMLDivElement>(null);
 
     // Initialize content with title if content is empty (Migration helper)
@@ -95,7 +95,10 @@ export default function NoteComponent({ note, scale }: NoteComponentProps) {
             nodeRef={nodeRef}
             handle={`.${styles.dragHandle}`}
             defaultPosition={{ x: note.x, y: note.y }}
-            onStart={() => { bringToFront(note.id); }}
+            onStart={() => {
+                bringToFront(note.id);
+                setFocusedNoteId(note.id);
+            }}
             onStop={handleStop}
             scale={scale}
         >
@@ -103,10 +106,14 @@ export default function NoteComponent({ note, scale }: NoteComponentProps) {
                 ref={nodeRef}
                 className={`${styles.noteContainer} note-item`}
                 style={{ zIndex: note.zIndex || 1 }}
-                onMouseDownCapture={() => bringToFront(note.id)}
+                onMouseDownCapture={() => {
+                    bringToFront(note.id);
+                    setFocusedNoteId(note.id);
+                }}
             >
                 <div className={styles.editorWrapper} onClick={() => {
                     bringToFront(note.id);
+                    setFocusedNoteId(note.id);
                     editor?.chain().focus().run();
                 }}>
                     <div className={`${styles.dragHandle} drag-handle-class`} title="Drag to move" />
