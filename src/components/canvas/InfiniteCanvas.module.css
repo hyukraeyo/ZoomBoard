@@ -2,15 +2,10 @@
   width: 100vw;
   height: 100vh;
   background-color: var(--bg-secondary);
-  background-image: 
-    linear-gradient(var(--canvas-grid) 1px, transparent 1px),
-    linear-gradient(90deg, var(--canvas-grid) 1px, transparent 1px);
-  /* Dynamic Grid Logic */
-  background-size: calc(40px * var(--scale, 1)) calc(40px * var(--scale, 1));
-  background-position: var(--x, 0)px var(--y, 0)px;
+
   overflow: hidden;
   position: relative;
-  will-change: background-position, background-size;
+  will-change: transform;
 }
 
 .canvasContent {

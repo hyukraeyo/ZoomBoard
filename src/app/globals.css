@@ -1,7 +1,7 @@
 :root {
   /* Core Base Colors - Muted/Zinc Palette */
   --bg-primary: #ffffff;
-  --bg-secondary: #f4f4f5; /* Zinc-100 */
+  --bg-secondary: #F6F5F0; /* Faded Beige */
   --bg-tertiary: #e4e4e7;  /* Zinc-200 */
   
   --text-primary: #18181b; /* Zinc-900 */
@@ -21,7 +21,7 @@
   --error: #f87171; /* Red-400 */
 
   /* Editor Specific */
-  --canvas-grid: #e4e4e7;
+
   --editor-bg: #ffffff;
   --editor-shadow: rgba(0, 0, 0, 0.04);
 
@@ -32,7 +32,7 @@
 
 [data-theme='dark'] {
   --bg-primary: #09090b; /* Zinc-950 */
-  --bg-secondary: #18181b; /* Zinc-900 */
+  --bg-secondary: #1C1B1A; /* Warm Dark */
   --bg-tertiary: #27272a; /* Zinc-800 */
   
   --text-primary: #fafafa; /* Zinc-50 */
@@ -46,7 +46,7 @@
   --accent-secondary: #818cf8;
   --accent-surface: #1e1b4b; /* Indigo-950 */
 
-  --canvas-grid: #27272a;
+
   --editor-bg: #18181b;
   --editor-shadow: rgba(0, 0, 0, 0.3);
 }
