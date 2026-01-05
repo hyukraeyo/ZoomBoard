@@ -3,8 +3,22 @@
 > eslint
 
 
-C:\Users\johr9\Documents\git\ZoomBoard\src\components\common\ThemeToggle.tsx
-  13:9  error  Error: Calling setState synchronously within an effect can trigger cascading renders
+C:\Users\johr9\Documents\git\ZoomBoard\src\app\notes\[id]\ClientNotePage.tsx
+  13:76  error    Unexpected any. Specify a different type                                                                                                                                                 @typescript-eslint/no-explicit-any
+  19:11  warning  The 'note' logical expression could make the dependencies of useMemo Hook (at line 34) change on every render. To fix this, wrap the initialization of 'note' in its own useMemo() Hook  react-hooks/exhaustive-deps
+
+C:\Users\johr9\Documents\git\ZoomBoard\src\app\notes\[id]\page.tsx
+  3:8   warning  'dynamic' is defined but never used  @typescript-eslint/no-unused-vars
+  4:10  warning  'useMemo' is defined but never used  @typescript-eslint/no-unused-vars
+
+C:\Users\johr9\Documents\git\ZoomBoard\src\app\page.tsx
+   2:8   warning  'NoteInitializer' is defined but never used  @typescript-eslint/no-unused-vars
+   3:10  warning  'Note' is defined but never used             @typescript-eslint/no-unused-vars
+   4:10  warning  'useMemo' is defined but never used          @typescript-eslint/no-unused-vars
+  21:23  error    Unexpected any. Specify a different type     @typescript-eslint/no-explicit-any
+
+C:\Users\johr9\Documents\git\ZoomBoard\src\components\layout\Sidebar.tsx
+  47:9  error  Error: Calling setState synchronously within an effect can trigger cascading renders
 
 Effects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:
 * Update external systems with the latest state from React.
@@ -12,14 +26,14 @@ Effects are intended to synchronize state between React and external systems suc
 
 Calling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).
 
-C:\Users\johr9\Documents\git\ZoomBoard\src\components\common\ThemeToggle.tsx:13:9
-  11 |         // Initial theme set from document attribute (which was set by inline script or SSR)
-  12 |         const currentTheme = document.documentElement.getAttribute("data-theme") as "light" | "dark";
-> 13 |         setTheme(currentTheme || "light");
-     |         ^^^^^^^^ Avoid calling setState() directly within an effect
-  14 |         setMounted(true);
-  15 |     }, []);
-  16 |  react-hooks/set-state-in-effect
+C:\Users\johr9\Documents\git\ZoomBoard\src\components\layout\Sidebar.tsx:47:9
+  45 |     const [isMounted, setIsMounted] = useState(false);
+  46 |     useEffect(() => {
+> 47 |         setIsMounted(true);
+     |         ^^^^^^^^^^^^ Avoid calling setState() directly within an effect
+  48 |         // Only fetch if we are logged in - to get private notes
+  49 |         // Public notes are already fetched via SSR (NoteInitializer)
+  50 |         if (user) {  react-hooks/set-state-in-effect
 
-✖ 1 problem (1 error, 0 warnings)
+✖ 9 problems (3 errors, 6 warnings)
 

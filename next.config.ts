@@ -1,11 +1,22 @@
 import type { NextConfig } from "next";
+import withBundleAnalyzerInit from "@next/bundle-analyzer";
 
 import withPWAInit from "@ducanh2912/next-pwa";
+
+const withBundleAnalyzer = withBundleAnalyzerInit({
+  enabled: process.env.ANALYZE === "true",
+});
 
 const nextConfig: NextConfig = {
   /* config options here */
   reactCompiler: true,
-  // Silence Turbopack/Webpack conflict error
+  // 3, 8. Bundle optimizations
+  experimental: {
+    optimizePackageImports: ["lucide-react", "@tiptap/react", "@tiptap/starter-kit"],
+  },
+  // 8. Performance & UI consistency
+  bundlePagesRouterDependencies: true,
+  poweredByHeader: false,
   turbopack: {},
 };
 
@@ -20,4 +31,4 @@ const withPWA = withPWAInit({
   },
 });
 
-export default withPWA(nextConfig);
+export default withBundleAnalyzer(withPWA(nextConfig));

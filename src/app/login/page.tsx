@@ -1,11 +1,13 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { supabase } from '@/lib/supabaseClient';
 import { useRouter } from 'next/navigation';
 import styles from './LoginPage.module.css';
+import { useAuthStore } from '@/store/useAuthStore';
 
 export default function LoginPage() {
+    const { user, isLoading: isAuthLoading } = useAuthStore();
     const [mode, setMode] = useState<'login' | 'signup'>('login');
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
@@ -17,6 +19,12 @@ export default function LoginPage() {
     const [error, setError] = useState<string | null>(null);
     const [idCheckMessage, setIdCheckMessage] = useState<string | null>(null);
     const router = useRouter();
+
+    useEffect(() => {
+        if (!isAuthLoading && user) {
+            router.replace('/');
+        }
+    }, [user, isAuthLoading, router]);
 
     // ID를 Supabase 이메일 형식으로 변환 (내부 처리용)
     const getEmailFromId = (id: string) => `${id}@id.zoomboard.app`;

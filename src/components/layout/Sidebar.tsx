@@ -8,11 +8,15 @@ import { useMemo, useState, useEffect } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
 import TrashPopover from './TrashPopover';
 
+import { Note } from '@/store/useNoteStore';
+
 interface SidebarProps {
     initialIsOpen?: boolean;
+    initialIsLocked?: boolean;
+    initialNotes?: Note[];
 }
 
-export default function Sidebar({ initialIsOpen }: SidebarProps) {
+export default function Sidebar({ initialIsOpen, initialIsLocked, initialNotes = [] }: SidebarProps) {
     const {
         notes,
         setFocusedNoteId,
@@ -23,7 +27,9 @@ export default function Sidebar({ initialIsOpen }: SidebarProps) {
         setIsSidebarOpen,
         isLocked,
         setIsLocked,
-        isLoading
+        isLoading,
+        fetchNotes,
+        isInitialized
     } = useNoteStore();
     const router = useRouter();
     const pathname = usePathname();
@@ -37,25 +43,40 @@ export default function Sidebar({ initialIsOpen }: SidebarProps) {
     // 서버 사이드 및 첫 렌더링 시에는 쿠키에서 가져온 initialIsOpen 값을 우선 사용
     // 마운트 이후에는 zustand store의 live state를 사용
     const [isMounted, setIsMounted] = useState(false);
-    // eslint-disable-next-line
-    useEffect(() => setIsMounted(true), []);
+
+    useEffect(() => {
+        setIsMounted(true);
+    }, []);
+
+    useEffect(() => {
+        // Only fetch if we are logged in - to get private notes
+        // Public notes are already fetched via SSR (NoteInitializer)
+        if (user) {
+            fetchNotes();
+        }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [user]);
 
     const sidebarState = isMounted ? isSidebarOpen : (initialIsOpen ?? true);
+    const sidebarLockedState = isMounted ? isLocked : (initialIsLocked ?? true);
 
     // Sort notes by Creation time for the list (Newest first)
     // or you might want Alphabetical. let's go with CreatedAt for now.
     // Sort and filter notes by Publication status
+    // Use initialNotes until store is initialized to prevent flash
+    const displayNotes = isInitialized ? notes : initialNotes;
+
     const publishedNotes = useMemo(() => {
-        return notes
-            .filter(note => note.isPublished && (user ? note.userId === user.id : false))
+        return displayNotes
+            .filter(note => note.isPublished)
             .sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
-    }, [notes, user]);
+    }, [displayNotes]);
 
     const unpublishedNotes = useMemo(() => {
-        return notes
+        return displayNotes
             .filter(note => !note.isPublished && (user ? note.userId === user.id : false))
             .sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
-    }, [notes, user]);
+    }, [displayNotes, user]);
 
     const handleNoteClick = (id: string) => {
         setFocusedNoteId(id);
@@ -256,7 +277,7 @@ export default function Sidebar({ initialIsOpen }: SidebarProps) {
             <aside
                 className={`
                     ${styles.sidebar} 
-                    ${!isLocked ? styles.floating : ''} 
+                    ${!sidebarLockedState ? styles.floating : ''} 
                     ${!sidebarState ? styles.closed : ''}
                 `.trim()}
                 onMouseLeave={() => {
@@ -326,56 +347,60 @@ export default function Sidebar({ initialIsOpen }: SidebarProps) {
                 </div>
 
                 {/* 게시되지 않은 페이지 (Unpublished / Private) */}
-                <div className={styles.sectionTitle} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', cursor: 'pointer', marginTop: 16 }} onClick={handleAddPage}>
-                    <span>게시되지 않은 페이지 (Unpublished)</span>
-                    <Plus size={14} />
-                </div>
+                {user && (
+                    <>
+                        <div className={styles.sectionTitle} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', cursor: 'pointer', marginTop: 16 }} onClick={handleAddPage}>
+                            <span>게시되지 않은 페이지 (Unpublished)</span>
+                            <Plus size={14} />
+                        </div>
 
-                <div className={styles.noteList}>
-                    {isLoading && unpublishedNotes.length === 0 ? (
-                        <>
-                            <div className={styles.skeletonItem}>
-                                <div className={`${styles.skeletonIcon} ${styles.skeleton}`} />
-                                <div className={`${styles.skeletonText} ${styles.skeleton}`} />
-                            </div>
-                            <div className={styles.skeletonItem}>
-                                <div className={`${styles.skeletonIcon} ${styles.skeleton}`} />
-                                <div className={`${styles.skeletonText} ${styles.skeleton}`} />
-                            </div>
-                            <div className={styles.skeletonItem}>
-                                <div className={`${styles.skeletonIcon} ${styles.skeleton}`} />
-                                <div className={`${styles.skeletonText} ${styles.skeleton}`} />
-                            </div>
-                        </>
-                    ) : (
-                        unpublishedNotes.map(note => (
-                            <div
-                                key={note.id}
-                                className={`${styles.noteItem} ${(focusedNoteId === note.id && pathname.startsWith('/notes/')) ? styles.active : ''} `}
-                                onClick={() => handleNoteClick(note.id)}
-                            >
-                                <FileText size={16} className={styles.icon} />
-                                <span style={{
-                                    whiteSpace: 'nowrap',
-                                    overflow: 'hidden',
-                                    textOverflow: 'ellipsis',
-                                    flex: 1,
-                                    minWidth: 0
-                                }}>
-                                    {note.title || '새 페이지'}
-                                </span>
+                        <div className={styles.noteList}>
+                            {isLoading && unpublishedNotes.length === 0 ? (
+                                <>
+                                    <div className={styles.skeletonItem}>
+                                        <div className={`${styles.skeletonIcon} ${styles.skeleton}`} />
+                                        <div className={`${styles.skeletonText} ${styles.skeleton}`} />
+                                    </div>
+                                    <div className={styles.skeletonItem}>
+                                        <div className={`${styles.skeletonIcon} ${styles.skeleton}`} />
+                                        <div className={`${styles.skeletonText} ${styles.skeleton}`} />
+                                    </div>
+                                    <div className={styles.skeletonItem}>
+                                        <div className={`${styles.skeletonIcon} ${styles.skeleton}`} />
+                                        <div className={`${styles.skeletonText} ${styles.skeleton}`} />
+                                    </div>
+                                </>
+                            ) : (
+                                unpublishedNotes.map(note => (
+                                    <div
+                                        key={note.id}
+                                        className={`${styles.noteItem} ${(focusedNoteId === note.id && pathname.startsWith('/notes/')) ? styles.active : ''} `}
+                                        onClick={() => handleNoteClick(note.id)}
+                                    >
+                                        <FileText size={16} className={styles.icon} />
+                                        <span style={{
+                                            whiteSpace: 'nowrap',
+                                            overflow: 'hidden',
+                                            textOverflow: 'ellipsis',
+                                            flex: 1,
+                                            minWidth: 0
+                                        }}>
+                                            {note.title || '새 페이지'}
+                                        </span>
 
-                                <div
-                                    className={styles.moreButton}
-                                    onClick={(e) => openMenu(e, note.id)}
-                                    title="Delete and more..."
-                                >
-                                    <MoreHorizontal size={14} />
-                                </div>
-                            </div>
-                        ))
-                    )}
-                </div>
+                                        <div
+                                            className={styles.moreButton}
+                                            onClick={(e) => openMenu(e, note.id)}
+                                            title="Delete and more..."
+                                        >
+                                            <MoreHorizontal size={14} />
+                                        </div>
+                                    </div>
+                                ))
+                            )}
+                        </div>
+                    </>
+                )}
 
                 <div style={{ marginTop: 24 }}></div>
 

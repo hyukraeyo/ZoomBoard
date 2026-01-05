@@ -5,6 +5,7 @@
   display: flex;
   justify-content: center;
   overflow-y: auto;
+  scrollbar-gutter: stable; /* Prevent layout shift on centering */
   background-color: var(--bg-primary); /* Editor background should be primary */
 }
 

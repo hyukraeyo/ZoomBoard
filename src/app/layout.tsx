@@ -12,22 +12,41 @@ import ThemeToggle from "@/components/common/ThemeToggle";
 const geistSans = Geist({
   variable: "--font-geist-sans",
   subsets: ["latin"],
+  display: 'swap',
+  preload: true,
+  fallback: ['system-ui', 'arial'],
 });
 
 const geistMono = Geist_Mono({
   variable: "--font-geist-mono",
   subsets: ["latin"],
+  display: 'swap',
+  preload: true,
+  fallback: ['monospace'],
 });
 
 export const metadata: Metadata = {
   title: "ZoomBoard | High Performance Interactive Infinite Canvas",
   description: "Next.js기반의 고성능 인터랙티브 무한 캔버스 보드. 기술적 SEO와 사용자 경험(UX)이 최적화된 협업 도구.",
   keywords: ["Next.js", "React Compiler", "SEO Optimization", "Infinite Canvas", "Collaboration Tool"],
+  authors: [{ name: "ZoomBoard Team" }],
+  viewport: "width=device-width, initial-scale=1",
+  robots: "index, follow",
+  icons: {
+    icon: "/favicon.ico",
+    apple: "/apple-touch-icon.png",
+  },
   openGraph: {
     title: "ZoomBoard | Interactive Canvas",
     description: "Experience the next level of performance with our optimized infinite canvas.",
     type: "website",
     locale: "ko_KR",
+    siteName: "ZoomBoard",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "ZoomBoard | Interactive Canvas",
+    description: "High performance interactive infinite canvas",
   },
 };
 
@@ -65,6 +84,9 @@ export default async function RootLayout({
   const themeCookie = cookieStore.get('theme');
   const theme = themeCookie ? themeCookie.value : 'light';
 
+  const sidebarLockedCookie = cookieStore.get('sidebar_locked');
+  const isSidebarLocked = sidebarLockedCookie ? sidebarLockedCookie.value === 'true' : true;
+
   // 🚀 Server Side Data Fetching
   // ... (keep creating initialNotes logic from previous file content)
   let initialNotes: Note[] = [];
@@ -87,6 +109,7 @@ export default async function RootLayout({
         zIndex: n.z_index,
         deletedAt: n.deleted_at ? Number(n.deleted_at) : null,
         isPublished: n.is_published || false,
+        userId: n.user_id || null,
       }));
     }
   } catch (e) {
@@ -94,7 +117,7 @@ export default async function RootLayout({
   }
 
   return (
-    <html lang="en" data-theme={theme} suppressHydrationWarning>
+    <html lang="en" data-theme={theme} className={`${geistSans.variable} ${geistMono.variable}`} suppressHydrationWarning>
       <head>
         <script
           dangerouslySetInnerHTML={{
@@ -117,10 +140,10 @@ export default async function RootLayout({
         />
       </head>
       <body className={`${geistSans.variable} ${geistMono.variable}`} suppressHydrationWarning>
-        <NoteInitializer notes={initialNotes} isSidebarOpen={isSidebarOpen} />
+        <NoteInitializer notes={initialNotes} isSidebarOpen={isSidebarOpen} isLocked={isSidebarLocked} />
         <AuthInitializer />
         <div style={{ display: 'flex', width: '100vw', height: '100vh', overflow: 'hidden' }}>
-          <Sidebar initialIsOpen={isSidebarOpen} />
+          <Sidebar initialIsOpen={isSidebarOpen} initialIsLocked={isSidebarLocked} initialNotes={initialNotes} />
           {children}
         </div>
         <ThemeToggle />

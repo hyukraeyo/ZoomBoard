@@ -49,6 +49,8 @@ interface NoteState {
     isLocked: boolean;
     setIsLocked: (isLocked: boolean) => void;
     setNotes: (notes: Note[]) => void;
+    isInitialized: boolean;
+    setIsInitialized: (isInitialized: boolean) => void;
 }
 
 import { persist } from 'zustand/middleware';
@@ -61,7 +63,9 @@ export const useNoteStore = create<NoteState>()(
             isLoading: false,
             isSidebarOpen: true,
             isLocked: true,
+            isInitialized: false,
             setNotes: (notes) => set({ notes }),
+            setIsInitialized: (val) => set({ isInitialized: val }),
 
             fetchNotes: async () => {
                 set({ isLoading: true });
@@ -324,7 +328,10 @@ export const useNoteStore = create<NoteState>()(
                 set({ isSidebarOpen: isOpen });
                 document.cookie = `sidebar_open=${isOpen}; path=/; max-age=31536000`; // 1 year
             },
-            setIsLocked: (isLocked) => set({ isLocked: isLocked }),
+            setIsLocked: (isLocked) => {
+                set({ isLocked: isLocked });
+                document.cookie = `sidebar_locked=${isLocked}; path=/; max-age=31536000`; // 1 year
+            },
         }),
         {
             name: 'zoomboard-storage', // unique name
