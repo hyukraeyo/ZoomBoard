@@ -111,7 +111,11 @@ export default function LoginModal({ onClose }: LoginModalProps) {
                     setError('회원가입 성공! 이제 로그인해주세요.');
                     setIsLoading(false);
                 } else {
-                    onClose ? onClose() : router.push('/');
+                    if (onClose) {
+                        onClose();
+                    } else {
+                        router.push('/');
+                    }
                 }
             }
         } else {
@@ -124,7 +128,11 @@ export default function LoginModal({ onClose }: LoginModalProps) {
                 setError('아이디 또는 비밀번호가 잘못되었습니다.');
                 setIsLoading(false);
             } else {
-                onClose ? onClose() : router.push('/');
+                if (onClose) {
+                    onClose();
+                } else {
+                    router.push('/');
+                }
             }
         }
     };

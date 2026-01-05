@@ -28,9 +28,9 @@ import { supabase } from '@/lib/supabaseClient';
 import { v4 as uuidv4 } from 'uuid';
 import { EditorView } from '@tiptap/pm/view';
 import { Node as ProsemirrorNode } from '@tiptap/pm/model';
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useRef } from "react";
 import { AlignLeft, AlignCenter, AlignRight, Maximize, Minimize } from 'lucide-react';
-import tippy from 'tippy.js';
+import tippy, { Instance } from 'tippy.js';
 
 const extensions = [
     Document,
@@ -224,7 +224,7 @@ export default function PageEditor({ note, editable = true }: PageEditorProps) {
         }
 
         const toolbar = imageToolbarRef.current;
-        let tippyInstance: any = null;
+        let tippyInstance: Instance | null = null;
 
         const updateToolbar = () => {
             if (!editor.isActive('image')) {
@@ -259,7 +259,6 @@ export default function PageEditor({ note, editable = true }: PageEditorProps) {
                 return;
             }
 
-            const coords = view.coordsAtPos(imageNodePos);
             const imageElement = view.nodeDOM(imageNodePos) as HTMLElement;
 
             if (!imageElement) {
@@ -268,7 +267,7 @@ export default function PageEditor({ note, editable = true }: PageEditorProps) {
                 return;
             }
 
-            const { top, left, width } = imageElement.getBoundingClientRect();
+            // Image element bounds are used by tippy's getReferenceClientRect
 
             if (!tippyInstance) {
                 tippyInstance = tippy(imageElement, {
