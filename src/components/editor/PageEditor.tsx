@@ -15,15 +15,22 @@ import Blockquote from '@tiptap/extension-blockquote';
 import History from '@tiptap/extension-history';
 import Placeholder from '@tiptap/extension-placeholder';
 import Dropcursor from '@tiptap/extension-dropcursor';
+import TaskList from '@tiptap/extension-task-list';
+import TaskItem from '@tiptap/extension-task-item';
+import SlashCommand, { getSuggestionItems, renderItems } from './extensions/SlashCommand';
 import styles from './PageEditor.module.css';
 import { useNoteStore, Note } from '@/store/useNoteStore';
 import { useEditor, EditorContent } from '@tiptap/react';
+import BubbleMenuExtension from '@tiptap/extension-bubble-menu';
 
-import Image from '@tiptap/extension-image';
+import { CustomImage } from './extensions/CustomImage';
 import { supabase } from '@/lib/supabaseClient';
 import { v4 as uuidv4 } from 'uuid';
 import { EditorView } from '@tiptap/pm/view';
 import { Node as ProsemirrorNode } from '@tiptap/pm/model';
+import { useEffect, useState, useRef } from "react";
+import { AlignLeft, AlignCenter, AlignRight, Maximize, Minimize } from 'lucide-react';
+import tippy from 'tippy.js';
 
 const extensions = [
     Document,
@@ -40,8 +47,22 @@ const extensions = [
     Blockquote,
     Blockquote,
     History,
-    Dropcursor,
-    Image,
+    Dropcursor.configure({
+        color: 'var(--accent-primary)',
+        width: 2,
+    }),
+    CustomImage,
+    TaskList,
+    TaskItem.configure({
+        nested: true,
+    }),
+    SlashCommand.configure({
+        suggestion: {
+            items: getSuggestionItems,
+            render: renderItems,
+        },
+    }),
+    BubbleMenuExtension,
     Placeholder.configure({
         placeholder: ({ node }) => {
             if (node.type.name === 'heading' && node.attrs.level === 1) {
@@ -49,6 +70,7 @@ const extensions = [
             }
             return "내용을 입력하거나 '/'를 눌러 명령어를 사용하세요...";
         },
+        includeChildren: true,
     }),
 ];
 
@@ -58,6 +80,7 @@ interface PageEditorProps {
 
 export default function PageEditor({ note }: PageEditorProps) {
     const { updateNote } = useNoteStore();
+    const imageToolbarRef = useRef<HTMLDivElement>(null);
 
     // Initialize content with title if content is empty (Migration helper)
     const initialContent = note.content || (note.title ? `<h1>${note.title}</h1>` : '');
@@ -94,19 +117,29 @@ export default function PageEditor({ note }: PageEditorProps) {
             },
         },
         onUpdate: ({ editor }) => {
-            const json = editor.getJSON();
-            // Extract the first block as title if it's a heading
+            const html = editor.getHTML();
+            const text = editor.getText();
+
+            // Refined title extraction: 
+            // 1. If first node is a heading, use its text.
+            // 2. Otherwise, use a truncated version of the first paragraph or the overall text.
             let title = '';
-            if (json.content && json.content.length > 0) {
-                const firstNode = json.content[0];
-                if (firstNode.content && firstNode.content.length > 0) {
-                    title = (firstNode.content[0] as { text?: string }).text || '';
+            const firstNode = editor.state.doc.firstChild;
+
+            if (firstNode) {
+                if (firstNode.type.name === 'heading' || firstNode.type.name === 'paragraph') {
+                    title = firstNode.textContent;
                 }
             }
 
+            // Fallback for very short content or empty headings
+            if (!title && text) {
+                title = text.slice(0, 30).split('\n')[0];
+            }
+
             updateNote(note.id, {
-                content: editor.getHTML(),
-                title: title
+                content: html,
+                title: title.trim()
             });
         },
         // We generally want immediatelyRender: false for SSR frameworks to match hydration
@@ -176,6 +209,95 @@ export default function PageEditor({ note }: PageEditorProps) {
     // For now, only update if the editor is empty or on mount.
     // Complex real-time collaboration needs Y.js, but for local-first single user:
 
+    useEffect(() => {
+        if (!editor || !imageToolbarRef.current) {
+            return;
+        }
+
+        const toolbar = imageToolbarRef.current;
+        let tippyInstance: any = null;
+
+        const updateToolbar = () => {
+            if (!editor.isActive('image')) {
+                toolbar.classList.remove('visible');
+                tippyInstance?.hide();
+                return;
+            }
+
+            const { view, state } = editor;
+            const { selection } = state;
+            const { from, to } = selection;
+
+            // Find the image node
+            let imageNodePos: number | null = null;
+            state.doc.nodesBetween(from, to, (node, pos) => {
+                if (node.type.name === 'image') {
+                    imageNodePos = pos;
+                    return false; // Stop iterating
+                }
+            });
+
+            if (imageNodePos === null) {
+                toolbar.classList.remove('visible');
+                tippyInstance?.hide();
+                return;
+            }
+
+            const node = state.doc.nodeAt(imageNodePos);
+            if (!node || node.type.name !== 'image') {
+                toolbar.classList.remove('visible');
+                tippyInstance?.hide();
+                return;
+            }
+
+            const coords = view.coordsAtPos(imageNodePos);
+            const imageElement = view.nodeDOM(imageNodePos) as HTMLElement;
+
+            if (!imageElement) {
+                toolbar.classList.remove('visible');
+                tippyInstance?.hide();
+                return;
+            }
+
+            const { top, left, width } = imageElement.getBoundingClientRect();
+
+            if (!tippyInstance) {
+                tippyInstance = tippy(imageElement, {
+                    getReferenceClientRect: () => imageElement.getBoundingClientRect(),
+                    appendTo: () => document.body,
+                    content: toolbar,
+                    showOnCreate: true,
+                    interactive: true,
+                    trigger: 'manual',
+                    placement: 'top',
+                    offset: [0, 10],
+                    duration: 0,
+                    animation: 'fade',
+                    onShown: () => {
+                        toolbar.classList.add('visible');
+                    },
+                    onHide: () => {
+                        toolbar.classList.remove('visible');
+                    },
+                });
+            } else {
+                tippyInstance.setProps({
+                    getReferenceClientRect: () => imageElement.getBoundingClientRect(),
+                });
+                tippyInstance.show();
+            }
+        };
+
+        editor.on('selectionUpdate', updateToolbar);
+        editor.on('transaction', updateToolbar); // Also update on transaction to catch attribute changes
+
+        return () => {
+            editor.off('selectionUpdate', updateToolbar);
+            editor.off('transaction', updateToolbar);
+            tippyInstance?.destroy();
+        };
+    }, [editor]);
+
 
     if (!editor) {
         return null;
@@ -217,7 +339,104 @@ export default function PageEditor({ note }: PageEditorProps) {
                     {note.isPublished ? '게시 취소' : '게시하기'}
                 </button>
             </div>
-            <div className={styles.editorWrapper} onClick={() => editor.chain().focus().run()}>
+            <div
+                className={styles.editorWrapper}
+                onClick={() => editor.chain().focus().run()}
+                style={{ opacity: 0, animation: 'fadeIn 0.5s ease forwards' }}
+            >
+                <style dangerouslySetInnerHTML={{
+                    __html: `
+                    @keyframes fadeIn {
+                        from { opacity: 0; transform: translateY(10px); }
+                        to { opacity: 1; transform: translateY(0); }
+                    }
+                    .image-bubble-menu {
+                        display: flex;
+                        background: var(--bg-primary);
+                        border: 1px solid var(--border-primary);
+                        border-radius: 8px;
+                        padding: 4px;
+                        box-shadow: var(--shadow-sm);
+                        gap: 2px;
+                        z-index: 10000;
+                        position: absolute;
+                        visibility: hidden;
+                        opacity: 0;
+                        transition: opacity 0.2s, visibility 0.2s;
+                    }
+                    .image-bubble-menu.visible {
+                        visibility: visible;
+                        opacity: 1;
+                    }
+                    .bubble-btn {
+                        padding: 6px;
+                        border-radius: 4px;
+                        border: none;
+                        background: transparent;
+                        color: var(--text-secondary);
+                        cursor: pointer;
+                        display: flex;
+                        align-items: center;
+                        justify-content: center;
+                        transition: all 0.2s;
+                    }
+                    .bubble-btn:hover {
+                        background: var(--hover-bg);
+                        color: var(--text-primary);
+                    }
+                    .bubble-btn.active {
+                        color: var(--accent-primary);
+                        background: var(--accent-surface);
+                    }
+                ` }} />
+
+                <div
+                    id="image-toolbar"
+                    ref={imageToolbarRef}
+                    className={`image-bubble-menu ${editor.isActive('image') ? 'visible' : ''}`}
+                    style={{
+                        position: 'fixed',
+                        // Note: Positioning will be handled by Tippy or manual logic below
+                    }}
+                >
+                    <button
+                        onClick={() => editor.chain().focus().updateAttributes('image', { alignment: 'left' }).run()}
+                        className={`bubble-btn ${editor.getAttributes('image').alignment === 'left' ? 'active' : ''}`}
+                        title="Align Left"
+                    >
+                        <AlignLeft size={18} />
+                    </button>
+                    <button
+                        onClick={() => editor.chain().focus().updateAttributes('image', { alignment: 'center' }).run()}
+                        className={`bubble-btn ${editor.getAttributes('image').alignment === 'center' ? 'active' : ''}`}
+                        title="Align Center"
+                    >
+                        <AlignCenter size={18} />
+                    </button>
+                    <button
+                        onClick={() => editor.chain().focus().updateAttributes('image', { alignment: 'right' }).run()}
+                        className={`bubble-btn ${editor.getAttributes('image').alignment === 'right' ? 'active' : ''}`}
+                        title="Align Right"
+                    >
+                        <AlignRight size={18} />
+                    </button>
+                    <div style={{ width: 1, height: 20, background: 'var(--border-primary)', margin: '0 4px', alignSelf: 'center' }} />
+                    <button
+                        onClick={() => editor.chain().focus().updateAttributes('image', { width: '50%' }).run()}
+                        className="bubble-btn"
+                        title="Small"
+                    >
+                        <Minimize size={18} />
+                    </button>
+                    <button
+                        onClick={() => editor.chain().focus().updateAttributes('image', { width: '100%' }).run()}
+                        className="bubble-btn"
+                        title="Large"
+                    >
+                        <Maximize size={18} />
+                    </button>
+                </div>
+
                 <EditorContent editor={editor} />
             </div>
         </div>

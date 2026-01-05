@@ -90,12 +90,8 @@
 }
 
 .closeButton {
-  /* opacity: 0; REMOVE opacity 0 to make it always accessible or follow isLocked logic in TSX */
-  /* If sidebar is hovering, we want visible controls usually. 
-     But let's stick to "hover to see" if desired, OR make it always visible like screenshot 
-     Screenshot shows icons present. */
   opacity: 1; 
-  color: #9b9a97;
+  color: var(--text-tertiary);
   cursor: pointer;
   padding: 4px;
   border-radius: 4px;
@@ -110,14 +106,14 @@
 }
 
 .closeButton:hover {
-  background-color: rgba(55, 53, 47, 0.08);
-  color: #37352f;
+  background-color: var(--hover-bg);
+  color: var(--text-primary);
 }
 
 .sectionTitle {
   font-size: 11px;
   font-weight: 600;
-  color: #9b9a97;
+  color: var(--text-tertiary);
   padding: 6px 8px;
   margin-top: 12px;
 }
@@ -168,19 +164,20 @@
   padding: 2px;
   border-radius: 4px;
   transition: opacity 0.1s, background-color 0.1s;
-  color: #9b9a97;
+  color: var(--text-tertiary);
   display: flex;
   align-items: center;
   justify-content: center;
 }
 
-.noteItem:hover .moreButton {
+.noteItem:hover .moreButton,
+.noteItem.active .moreButton {
   opacity: 1;
 }
 
 .moreButton:hover {
-  background-color: rgba(55, 53, 47, 0.08);
-  color: #37352f;
+  background-color: var(--hover-bg);
+  color: var(--text-primary);
 }
 
 .moreMenu {
@@ -202,7 +199,7 @@
   border-radius: 4px;
   cursor: pointer;
   font-size: 13px;
-  color: #37352f;
+  color: var(--text-primary);
   display: flex;
   align-items: center;
   gap: 8px;
@@ -210,7 +207,7 @@
 }
 
 .moreMenuItem:hover {
-  background-color: rgba(55, 53, 47, 0.08);
+  background-color: var(--hover-bg);
 }
 
 .deleteItem {

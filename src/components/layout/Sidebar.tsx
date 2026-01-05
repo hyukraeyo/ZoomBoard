@@ -303,7 +303,8 @@ export default function Sidebar({ initialIsOpen }: SidebarProps) {
                                     whiteSpace: 'nowrap',
                                     overflow: 'hidden',
                                     textOverflow: 'ellipsis',
-                                    flex: 1
+                                    flex: 1,
+                                    minWidth: 0
                                 }}>
                                     {note.title || '새 페이지'}
                                 </span>
@@ -352,7 +353,8 @@ export default function Sidebar({ initialIsOpen }: SidebarProps) {
                                     whiteSpace: 'nowrap',
                                     overflow: 'hidden',
                                     textOverflow: 'ellipsis',
-                                    flex: 1
+                                    flex: 1,
+                                    minWidth: 0
                                 }}>
                                     {note.title || '새 페이지'}
                                 </span>

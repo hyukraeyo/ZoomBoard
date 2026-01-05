@@ -78,21 +78,7 @@ body {
   -moz-osx-font-smoothing: grayscale;
 }
 
-/* TipTap Editor Styles */
-.ProseMirror {
-  outline: none;
-  min-height: 100%;
-  color: var(--text-primary);
-  line-height: 1.6;
-}
 
-.ProseMirror p.is-editor-empty:first-child::before {
-  color: var(--text-tertiary);
-  content: attr(data-placeholder);
-  float: left;
-  height: 0;
-  pointer-events: none;
-}
 
 
 /* Custom Scrollbar */
@@ -128,9 +114,10 @@ body {
   right: 24px;
   display: flex;
   align-items: center;
-  gap: 10px;
-  padding: 10px 16px;
-  border-radius: 99px;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
   border: 1px solid var(--border-primary);
   background: var(--bg-primary);
   color: var(--text-primary);
@@ -166,12 +153,6 @@ body {
 
 .theme-toggle-btn.dark .icon-wrapper {
   color: #fbbf24; /* Amber for Sun */
-}
-
-.theme-toggle-btn .toggle-label {
-  font-size: 0.875rem;
-  font-weight: 600;
-  letter-spacing: -0.01em;
 }
 
 /* Base Transition for Theme Switching */

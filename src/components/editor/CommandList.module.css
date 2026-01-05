@@ -1,0 +1,75 @@
+
+.commandList {
+  background: var(--bg-primary);
+  border: 1px solid var(--border-primary);
+  border-radius: 8px;
+  box-shadow: var(--shadow-sm);
+  padding: 6px;
+  min-width: 280px;
+  max-height: 320px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  z-index: 10000;
+}
+
+.commandItem {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 8px 10px;
+  border-radius: 6px;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  text-align: left;
+  transition: background 0.1s ease;
+  width: 100%;
+}
+
+.commandItem:hover,
+.commandItem.selected {
+  background: var(--hover-bg);
+}
+
+.iconBox {
+  width: 32px;
+  height: 32px;
+  border-radius: 4px;
+  background: var(--bg-tertiary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-secondary);
+  flex-shrink: 0;
+}
+
+.commandItem.selected .iconBox {
+    color: var(--accent-primary);
+}
+
+.textBox {
+  display: flex;
+  flex-direction: column;
+}
+
+.title {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--text-primary);
+  margin: 0;
+}
+
+.description {
+  font-size: 11px;
+  color: var(--text-tertiary);
+  margin: 0;
+}
+
+.noResults {
+  padding: 12px;
+  font-size: 13px;
+  color: var(--text-tertiary);
+  text-align: center;
+}

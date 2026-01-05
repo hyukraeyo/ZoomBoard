@@ -48,7 +48,6 @@ export default function ThemeToggle() {
                     <Sun size={20} strokeWidth={2.5} />
                 )}
             </div>
-            <span className="toggle-label">{theme === "light" ? "Dark" : "Light"}</span>
         </button>
     );
 }

@@ -1,0 +1,65 @@
+
+> zoom-board@0.1.0 build
+> next build
+
+▲ Next.js 16.1.1 (Turbopack)
+- Environments: .env.local
+
+  Creating an optimized production build ...
+
+> Build error occurred
+Error: Turbopack build failed with 2 errors:
+./src/components/editor/PageEditor.tsx:24:1
+Export BubbleMenu doesn't exist in target module
+[0m [90m 22 |[39m [36mimport[39m styles [36mfrom[39m [32m'./PageEditor.module.css'[39m[33m;[39m
+ [90m 23 |[39m [36mimport[39m { useNoteStore[33m,[39m [33mNote[39m } [36mfrom[39m [32m'@/store/useNoteStore'[39m[33m;[39m
+[31m[1m>[22m[39m[90m 24 |[39m [36mimport[39m { useEditor[33m,[39m [33mEditorContent[39m[33m,[39m [33mBubbleMenu[39m } [36mfrom[39m [32m'@tiptap/react'[39m[33m;[39m
+ [90m    |[39m [31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m
+ [90m 25 |[39m [36mimport[39m { [33mCustomImage[39m } [36mfrom[39m [32m'./extensions/CustomImage'[39m[33m;[39m
+ [90m 26 |[39m [36mimport[39m { supabase } [36mfrom[39m [32m'@/lib/supabaseClient'[39m[33m;[39m
+ [90m 27 |[39m [36mimport[39m { v4 [36mas[39m uuidv4 } [36mfrom[39m [32m'uuid'[39m[33m;[39m[0m
+
+The export BubbleMenu was not found in module [project]/node_modules/@tiptap/react/dist/index.js [app-client] (ecmascript).
+Did you mean to import updateMarkViewAttributes?
+All exports of the module are statically known (It doesn't have dynamic exports). So it's known statically that the requested export doesn't exist.
+
+Import traces:
+  Client Component Browser:
+    ./src/components/editor/PageEditor.tsx [Client Component Browser]
+    ./src/app/notes/[id]/page.tsx [Client Component Browser]
+    ./src/app/notes/[id]/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./src/components/editor/PageEditor.tsx [Client Component SSR]
+    ./src/app/notes/[id]/page.tsx [Client Component SSR]
+    ./src/app/notes/[id]/page.tsx [Server Component]
+
+
+./src/components/editor/PageEditor.tsx:23:1
+Export BubbleMenu doesn't exist in target module
+[0m [90m 21 |[39m [36mimport[39m styles [36mfrom[39m [32m'./PageEditor.module.css'[39m[33m;[39m
+ [90m 22 |[39m [36mimport[39m { useNoteStore[33m,[39m [33mNote[39m } [36mfrom[39m [32m'@/store/useNoteStore'[39m[33m;[39m
+[31m[1m>[22m[39m[90m 23 |[39m [36mimport[39m { useEditor[33m,[39m [33mEditorContent[39m[33m,[39m [33mBubbleMenu[39m } [36mfrom[39m [32m'@tiptap/react'[39m[33m;[39m
+ [90m    |[39m [31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m
+ [90m 24 |[39m
+ [90m 25 |[39m [36mimport[39m { [33mCustomImage[39m } [36mfrom[39m [32m'./extensions/CustomImage'[39m[33m;[39m
+ [90m 26 |[39m [36mimport[39m { supabase } [36mfrom[39m [32m'@/lib/supabaseClient'[39m[33m;[39m[0m
+
+The export BubbleMenu was not found in module [project]/node_modules/@tiptap/react/dist/index.js [app-ssr] (ecmascript).
+Did you mean to import updateMarkViewAttributes?
+All exports of the module are statically known (It doesn't have dynamic exports). So it's known statically that the requested export doesn't exist.
+
+Import traces:
+  Client Component Browser:
+    ./src/components/editor/PageEditor.tsx [Client Component Browser]
+    ./src/app/notes/[id]/page.tsx [Client Component Browser]
+    ./src/app/notes/[id]/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./src/components/editor/PageEditor.tsx [Client Component SSR]
+    ./src/app/notes/[id]/page.tsx [Client Component SSR]
+    ./src/app/notes/[id]/page.tsx [Server Component]
+
+
+    at <unknown> (./src/components/editor/PageEditor.tsx:24:1)
+    at <unknown> (./src/components/editor/PageEditor.tsx:23:1)
