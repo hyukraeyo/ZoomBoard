@@ -46,7 +46,7 @@ export default function Home() {
                   boxShadow: '0 1px 3px rgba(0,0,0,0.1)',
                   transition: 'transform 0.2s, box-shadow 0.2s',
                   border: '1px solid var(--border-primary)',
-                  height: 200,
+                  height: 280,
                   display: 'flex',
                   flexDirection: 'column'
                 }}
@@ -71,18 +71,18 @@ export default function Home() {
                 }}>
                   {note.title || '제목 없음'}
                 </h2>
-                <div style={{
-                  flex: 1,
-                  fontSize: '0.9rem',
-                  color: 'var(--text-secondary)',
-                  overflow: 'hidden',
-                  textOverflow: 'ellipsis',
-                  display: '-webkit-box',
-                  WebkitLineClamp: 4,
-                  WebkitBoxOrient: 'vertical'
-                }}>
-                  {/* Simple text extraction for preview */}
-                  {note.content?.replace(/<[^>]+>/g, '') || '내용 없음'}
+                <div style={{ flex: 1, overflow: 'hidden' }}>
+                  <div
+                    className="line-clamp-4"
+                    style={{
+                      fontSize: '0.9rem',
+                      color: 'var(--text-secondary)',
+                      lineHeight: '1.6',
+                    }}
+                  >
+                    {/* Simple text extraction for preview */}
+                    {note.content?.replace(/<[^>]+>/g, '') || '내용 없음'}
+                  </div>
                 </div>
                 <div style={{ marginTop: 16, fontSize: '0.8rem', color: 'var(--text-tertiary)' }}>
                   {new Date(note.createdAt).toLocaleDateString()}

@@ -88,6 +88,7 @@ body {
   pointer-events: none;
 }
 
+
 /* Custom Scrollbar */
 ::-webkit-scrollbar {
   width: 8px;
@@ -102,4 +103,14 @@ body {
 }
 ::-webkit-scrollbar-thumb:hover {
   background: var(--text-tertiary);
+}
+
+/* Line Clamp Utility */
+.line-clamp-4 {
+  display: -webkit-box;
+  -webkit-line-clamp: 4;
+  -webkit-box-orient: vertical; /*! autoprefixer: ignore next */
+  overflow: hidden;
+  text-overflow: ellipsis;
+  word-break: break-word;
 }
