@@ -1,6 +1,7 @@
 import { create } from 'zustand';
 import { supabase } from '@/lib/supabaseClient';
 import { v4 as uuidv4 } from 'uuid';
+import { useAuthStore } from './useAuthStore';
 
 export interface Note {
     id: string;
@@ -12,6 +13,7 @@ export interface Note {
     zIndex: number;
     deletedAt?: number | null;
     isPublished?: boolean;
+    userId?: string | null;
 }
 
 interface DBNote {
@@ -24,6 +26,7 @@ interface DBNote {
     z_index: number;
     deleted_at: number | null;
     is_published?: boolean;
+    user_id?: string | null;
 }
 
 interface NoteState {
@@ -84,6 +87,7 @@ export const useNoteStore = create<NoteState>()(
                     zIndex: n.z_index,
                     deletedAt: n.deleted_at ? Number(n.deleted_at) : null,
                     isPublished: n.is_published || false,
+                    userId: n.user_id || null,
                 }));
 
                 set({ notes: formattedNotes, isLoading: false });
@@ -110,12 +114,15 @@ export const useNoteStore = create<NoteState>()(
                     createdAt: n.created_at ? Number(n.created_at) : Date.now(),
                     zIndex: n.z_index,
                     deletedAt: n.deleted_at ? Number(n.deleted_at) : null,
+                    userId: n.user_id || null,
                 }));
 
                 set({ trashNotes: formattedTrash });
             },
 
             addNote: async (x, y) => {
+                const { user } = useAuthStore.getState();
+                const userId = user?.id || null;
                 const state = get();
                 const maxZ = state.notes.length > 0 ? Math.max(...state.notes.map(n => n.zIndex || 1)) : 1;
                 const newNote: Note = {
@@ -126,6 +133,7 @@ export const useNoteStore = create<NoteState>()(
                     content: '<h1></h1>',
                     createdAt: Date.now(),
                     zIndex: maxZ + 1,
+                    userId,
                 };
 
                 // Optimistic Update
@@ -143,6 +151,7 @@ export const useNoteStore = create<NoteState>()(
                         content: newNote.content,
                         created_at: newNote.createdAt, // Send number, DB is bigint
                         z_index: newNote.zIndex,
+                        user_id: userId,
                     });
 
                 if (error) {

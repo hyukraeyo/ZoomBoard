@@ -1,0 +1,181 @@
+.container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    width: 100%;
+    background: var(--bg-secondary);
+    font-family: var(--font-family-sans);
+}
+
+.loginCard {
+    background: var(--bg-primary);
+    padding: 48px;
+    border-radius: 16px;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.05);
+    width: 100%;
+    max-width: 420px;
+    border: 1px solid var(--border-primary);
+    animation: slideUp 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes slideUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.title {
+    font-size: 2rem;
+    font-weight: 800;
+    text-align: center;
+    margin-bottom: 8px;
+    color: var(--text-primary);
+    letter-spacing: -0.02em;
+}
+
+.subtitle {
+    text-align: center;
+    color: var(--text-tertiary);
+    font-size: 0.95rem;
+    margin-bottom: 40px;
+}
+
+.form {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.inputGroup {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.inputGroup label {
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--text-secondary);
+}
+
+.inputGroup input {
+    padding: 12px 16px;
+    border-radius: 8px;
+    border: 1px solid var(--border-primary);
+    background: var(--bg-primary);
+    color: var(--text-primary);
+    font-size: 1rem;
+    transition: all 0.2s;
+}
+
+.inputGroup input:focus {
+    outline: none;
+    border-color: var(--accent-primary);
+    box-shadow: 0 0 0 3px var(--accent-surface);
+}
+
+.inputIdWrapper {
+    display: flex;
+    gap: 8px;
+}
+
+.inputIdWrapper input {
+    flex: 1;
+}
+
+.checkButton {
+    padding: 0 16px;
+    border-radius: 8px;
+    border: 1px solid var(--border-primary);
+    background: var(--bg-tertiary);
+    color: var(--text-primary);
+    font-size: 0.85rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+    white-space: nowrap;
+}
+
+.checkButton:hover:not(:disabled) {
+    background: var(--hover-bg);
+}
+
+.checkButton:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.checkButton.success {
+    background: #d1fae5;
+    color: #065f46;
+    border-color: #34d399;
+}
+
+.error {
+    color: #ef4444;
+    font-size: 0.85rem;
+    text-align: left;
+    margin: 4px 0 0 0;
+}
+
+.successMsg {
+    color: #10b981;
+    font-size: 0.85rem;
+    text-align: left;
+    margin: 4px 0 0 0;
+}
+
+.loginButton {
+    padding: 14px;
+    border-radius: 8px;
+    border: none;
+    background: var(--text-primary);
+    color: var(--bg-primary);
+    font-weight: 700;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: transform 0.2s, opacity 0.2s;
+    margin-top: 10px;
+}
+
+.loginButton:hover {
+    opacity: 0.9;
+    transform: translateY(-1px);
+}
+
+.loginButton:active {
+    transform: translateY(0);
+}
+
+.signUpButton {
+    padding: 14px;
+    border-radius: 8px;
+    border: 1px solid var(--border-primary);
+    background: transparent;
+    color: var(--text-primary);
+    font-weight: 600;
+    font-size: 0.95rem;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.signUpButton:hover {
+    background: var(--hover-bg);
+}
+
+.footer {
+    margin-top: 32px;
+    text-align: center;
+}
+
+.footer p {
+    color: var(--text-tertiary);
+    font-size: 0.85rem;
+    cursor: pointer;
+    text-decoration: underline;
+    transition: color 0.2s;
+}
+
+.footer p:hover {
+    color: var(--text-secondary);
+}

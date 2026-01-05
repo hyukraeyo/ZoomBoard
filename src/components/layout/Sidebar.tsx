@@ -2,7 +2,8 @@
 
 import { useNoteStore } from '@/store/useNoteStore';
 import styles from './Sidebar.module.css';
-import { FileText, Plus, Search, Home, Settings, MoreHorizontal, Trash2, Menu, ChevronsLeft, ChevronsRight } from 'lucide-react';
+import { FileText, Plus, Search, Home, Settings, MoreHorizontal, Trash2, Menu, ChevronsLeft, ChevronsRight, LogIn, LogOut, User } from 'lucide-react';
+import { useAuthStore } from '@/store/useAuthStore';
 import { useMemo, useState, useEffect } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
 import TrashPopover from './TrashPopover';
@@ -30,6 +31,7 @@ export default function Sidebar({ initialIsOpen }: SidebarProps) {
     const [trashOpen, setTrashOpen] = useState(false);
     const [trashPosition, setTrashPosition] = useState({ top: 0, left: 0 });
     const [isHoveringTrigger, setIsHoveringTrigger] = useState(false);
+    const { user, signOut } = useAuthStore();
 
     // Hydration Mismatch Fix:
     // 서버 사이드 및 첫 렌더링 시에는 쿠키에서 가져온 initialIsOpen 값을 우선 사용
@@ -45,15 +47,15 @@ export default function Sidebar({ initialIsOpen }: SidebarProps) {
     // Sort and filter notes by Publication status
     const publishedNotes = useMemo(() => {
         return notes
-            .filter(note => note.isPublished)
+            .filter(note => note.isPublished && (user ? note.userId === user.id : false))
             .sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
-    }, [notes]);
+    }, [notes, user]);
 
     const unpublishedNotes = useMemo(() => {
         return notes
-            .filter(note => !note.isPublished)
+            .filter(note => !note.isPublished && (user ? note.userId === user.id : false))
             .sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
-    }, [notes]);
+    }, [notes, user]);
 
     const handleNoteClick = (id: string) => {
         setFocusedNoteId(id);
@@ -62,6 +64,10 @@ export default function Sidebar({ initialIsOpen }: SidebarProps) {
 
     const handleAddPage = async (e?: React.MouseEvent) => {
         e?.stopPropagation();
+        if (!user) {
+            router.push('/login');
+            return;
+        }
         const newNoteId = await addNote(0, 0);
         router.push(`/notes/${newNoteId}`);
     };
@@ -384,6 +390,28 @@ export default function Sidebar({ initialIsOpen }: SidebarProps) {
                     <Trash2 size={16} className={styles.icon} />
                     <span>휴지통 (Trash)</span>
                 </div>
+
+                <div style={{ flex: 1 }}></div>
+
+                {user ? (
+                    <div className={styles.authSection}>
+                        <div className={styles.userInfo}>
+                            <div className={styles.userAvatar}>
+                                <User size={14} />
+                            </div>
+                            <span className={styles.userEmail}>{user.email?.split('@')[0]}</span>
+                        </div>
+                        <div className={styles.noteItem} onClick={() => signOut()}>
+                            <LogOut size={16} className={styles.icon} />
+                            <span>로그아웃 (Logout)</span>
+                        </div>
+                    </div>
+                ) : (
+                    <div className={styles.noteItem} onClick={() => router.push('/login')}>
+                        <LogIn size={16} className={styles.icon} />
+                        <span>로그인 (Login)</span>
+                    </div>
+                )}
 
                 {/* Render Trash Popover */}
                 {trashOpen && (

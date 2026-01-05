@@ -76,9 +76,10 @@ const extensions = [
 
 interface PageEditorProps {
     note: Note;
+    editable?: boolean;
 }
 
-export default function PageEditor({ note }: PageEditorProps) {
+export default function PageEditor({ note, editable = true }: PageEditorProps) {
     const { updateNote } = useNoteStore();
     const imageToolbarRef = useRef<HTMLDivElement>(null);
 
@@ -88,6 +89,7 @@ export default function PageEditor({ note }: PageEditorProps) {
     const editor = useEditor({
         extensions,
         content: initialContent,
+        editable,
         editorProps: {
             attributes: {
                 class: styles.content,
@@ -204,6 +206,13 @@ export default function PageEditor({ note }: PageEditorProps) {
         }
     };
 
+    // Update editability if it changes
+    useEffect(() => {
+        if (editor) {
+            editor.setEditable(editable);
+        }
+    }, [editor, editable]);
+
     // Update editor content if note changes externally (e.g. from a fresh fetch or another source)
     // Be careful not to create infinite loops or reset cursor position while typing
     // For now, only update if the editor is empty or on mount.
@@ -314,30 +323,32 @@ export default function PageEditor({ note }: PageEditorProps) {
                 gap: 12,
                 alignItems: 'center'
             }}>
-                {note.isPublished && (
+                {editable && note.isPublished && (
                     <span style={{ fontSize: '0.85rem', color: '#34D399', fontWeight: 600 }}>
                         ● 게시됨 (Published)
                     </span>
                 )}
-                <button
-                    onClick={(e) => {
-                        e.stopPropagation();
-                        updateNote(note.id, { isPublished: !note.isPublished });
-                    }}
-                    style={{
-                        padding: '6px 12px',
-                        fontSize: '0.9rem',
-                        fontWeight: 500,
-                        borderRadius: 6,
-                        border: '1px solid var(--border-secondary)',
-                        background: note.isPublished ? 'transparent' : 'var(--text-primary)',
-                        color: note.isPublished ? 'var(--text-secondary)' : 'var(--bg-primary)',
-                        cursor: 'pointer',
-                        transition: 'all 0.2s',
-                    }}
-                >
-                    {note.isPublished ? '게시 취소' : '게시하기'}
-                </button>
+                {editable && (
+                    <button
+                        onClick={(e) => {
+                            e.stopPropagation();
+                            updateNote(note.id, { isPublished: !note.isPublished });
+                        }}
+                        style={{
+                            padding: '6px 12px',
+                            fontSize: '0.9rem',
+                            fontWeight: 500,
+                            borderRadius: 6,
+                            border: '1px solid var(--border-secondary)',
+                            background: note.isPublished ? 'transparent' : 'var(--text-primary)',
+                            color: note.isPublished ? 'var(--text-secondary)' : 'var(--bg-primary)',
+                            cursor: 'pointer',
+                            transition: 'all 0.2s',
+                        }}
+                    >
+                        {note.isPublished ? '게시 취소' : '게시하기'}
+                    </button>
+                )}
             </div>
             <div
                 className={styles.editorWrapper}
@@ -390,52 +401,53 @@ export default function PageEditor({ note }: PageEditorProps) {
                     }
                 ` }} />
 
-                <div
-                    id="image-toolbar"
-                    ref={imageToolbarRef}
-                    className={`image-bubble-menu ${editor.isActive('image') ? 'visible' : ''}`}
-                    style={{
-                        position: 'fixed',
-                        // Note: Positioning will be handled by Tippy or manual logic below
-                    }}
-                >
-                    <button
-                        onClick={() => editor.chain().focus().updateAttributes('image', { alignment: 'left' }).run()}
-                        className={`bubble-btn ${editor.getAttributes('image').alignment === 'left' ? 'active' : ''}`}
-                        title="Align Left"
+                {editor && editable && (
+                    <div
+                        id="image-toolbar"
+                        ref={imageToolbarRef}
+                        className={`image-bubble-menu ${editor.isActive('image') ? 'visible' : ''}`}
+                        style={{
+                            position: 'fixed',
+                        }}
                     >
-                        <AlignLeft size={18} />
-                    </button>
-                    <button
-                        onClick={() => editor.chain().focus().updateAttributes('image', { alignment: 'center' }).run()}
-                        className={`bubble-btn ${editor.getAttributes('image').alignment === 'center' ? 'active' : ''}`}
-                        title="Align Center"
-                    >
-                        <AlignCenter size={18} />
-                    </button>
-                    <button
-                        onClick={() => editor.chain().focus().updateAttributes('image', { alignment: 'right' }).run()}
-                        className={`bubble-btn ${editor.getAttributes('image').alignment === 'right' ? 'active' : ''}`}
-                        title="Align Right"
-                    >
-                        <AlignRight size={18} />
-                    </button>
-                    <div style={{ width: 1, height: 20, background: 'var(--border-primary)', margin: '0 4px', alignSelf: 'center' }} />
-                    <button
-                        onClick={() => editor.chain().focus().updateAttributes('image', { width: '50%' }).run()}
-                        className="bubble-btn"
-                        title="Small"
-                    >
-                        <Minimize size={18} />
-                    </button>
-                    <button
-                        onClick={() => editor.chain().focus().updateAttributes('image', { width: '100%' }).run()}
-                        className="bubble-btn"
-                        title="Large"
-                    >
-                        <Maximize size={18} />
-                    </button>
-                </div>
+                        <button
+                            onClick={() => editor.chain().focus().updateAttributes('image', { alignment: 'left' }).run()}
+                            className={`bubble-btn ${editor.getAttributes('image').alignment === 'left' ? 'active' : ''}`}
+                            title="Align Left"
+                        >
+                            <AlignLeft size={18} />
+                        </button>
+                        <button
+                            onClick={() => editor.chain().focus().updateAttributes('image', { alignment: 'center' }).run()}
+                            className={`bubble-btn ${editor.getAttributes('image').alignment === 'center' ? 'active' : ''}`}
+                            title="Align Center"
+                        >
+                            <AlignCenter size={18} />
+                        </button>
+                        <button
+                            onClick={() => editor.chain().focus().updateAttributes('image', { alignment: 'right' }).run()}
+                            className={`bubble-btn ${editor.getAttributes('image').alignment === 'right' ? 'active' : ''}`}
+                            title="Align Right"
+                        >
+                            <AlignRight size={18} />
+                        </button>
+                        <div style={{ width: 1, height: 20, background: 'var(--border-primary)', margin: '0 4px', alignSelf: 'center' }} />
+                        <button
+                            onClick={() => editor.chain().focus().updateAttributes('image', { width: '50%' }).run()}
+                            className="bubble-btn"
+                            title="Small"
+                        >
+                            <Minimize size={18} />
+                        </button>
+                        <button
+                            onClick={() => editor.chain().focus().updateAttributes('image', { width: '100%' }).run()}
+                            className="bubble-btn"
+                            title="Large"
+                        >
+                            <Maximize size={18} />
+                        </button>
+                    </div>
+                )}
 
                 <EditorContent editor={editor} />
             </div>

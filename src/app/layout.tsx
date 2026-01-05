@@ -3,6 +3,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { createClient } from "@supabase/supabase-js";
 import NoteInitializer from "@/components/providers/NoteInitializer";
+import AuthInitializer from "@/components/providers/AuthInitializer";
 import { Note } from "@/store/useNoteStore";
 import { cookies } from "next/headers";
 import Sidebar from "@/components/layout/Sidebar";
@@ -51,8 +52,10 @@ const supabaseServer = createClient(supabaseUrl, supabaseAnonKey);
 
 export default async function RootLayout({
   children,
+  modal,
 }: Readonly<{
   children: React.ReactNode;
+  modal: React.ReactNode;
 }>) {
   // 🍪 Read Cookies for UI State
   const cookieStore = await cookies();
@@ -115,11 +118,13 @@ export default async function RootLayout({
       </head>
       <body className={`${geistSans.variable} ${geistMono.variable}`} suppressHydrationWarning>
         <NoteInitializer notes={initialNotes} isSidebarOpen={isSidebarOpen} />
+        <AuthInitializer />
         <div style={{ display: 'flex', width: '100vw', height: '100vh', overflow: 'hidden' }}>
           <Sidebar initialIsOpen={isSidebarOpen} />
           {children}
         </div>
         <ThemeToggle />
+        {modal}
       </body>
     </html>
   );

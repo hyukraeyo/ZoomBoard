@@ -1,0 +1,193 @@
+.overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.5);
+    backdrop-filter: blur(4px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 9999;
+    animation: fadeIn 0.2s ease;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+@keyframes slideUp {
+    from { opacity: 0; transform: translateY(20px) scale(0.98); }
+    to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+.modal {
+    background: var(--bg-primary);
+    padding: 40px;
+    border-radius: 16px;
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+    width: 100%;
+    max-width: 400px;
+    border: 1px solid var(--border-primary);
+    position: relative;
+    animation: slideUp 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.closeButton {
+    position: absolute;
+    top: 16px;
+    right: 16px;
+    background: transparent;
+    border: none;
+    color: var(--text-tertiary);
+    cursor: pointer;
+    padding: 4px;
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+}
+
+.closeButton:hover {
+    background: var(--hover-bg);
+    color: var(--text-primary);
+}
+
+.title {
+    font-size: 1.75rem;
+    font-weight: 800;
+    text-align: center;
+    margin-bottom: 8px;
+    color: var(--text-primary);
+    letter-spacing: -0.02em;
+}
+
+.subtitle {
+    text-align: center;
+    color: var(--text-tertiary);
+    font-size: 0.9rem;
+    margin-bottom: 32px;
+}
+
+.form {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.inputGroup {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.inputGroup label {
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: var(--text-secondary);
+}
+
+.inputGroup input {
+    padding: 10px 14px;
+    border-radius: 8px;
+    border: 1px solid var(--border-primary);
+    background: var(--bg-primary);
+    color: var(--text-primary);
+    font-size: 0.95rem;
+    transition: all 0.2s;
+}
+
+.inputGroup input:focus {
+    outline: none;
+    border-color: var(--accent-primary);
+    box-shadow: 0 0 0 3px var(--accent-surface);
+}
+
+.inputIdWrapper {
+    display: flex;
+    gap: 8px;
+}
+
+.inputIdWrapper input {
+    flex: 1;
+}
+
+.checkButton {
+    padding: 0 14px;
+    border-radius: 8px;
+    border: 1px solid var(--border-primary);
+    background: var(--bg-tertiary);
+    color: var(--text-primary);
+    font-size: 0.8rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+    white-space: nowrap;
+}
+
+.checkButton:hover:not(:disabled) {
+    background: var(--hover-bg);
+}
+
+.checkButton:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.checkButton.success {
+    background: #d1fae5;
+    color: #065f46;
+    border-color: #34d399;
+}
+
+.error {
+    color: #ef4444;
+    font-size: 0.8rem;
+    text-align: left;
+    margin: 2px 0 0 0;
+}
+
+.successMsg {
+    color: #10b981;
+    font-size: 0.8rem;
+    text-align: left;
+    margin: 2px 0 0 0;
+}
+
+.loginButton {
+    padding: 12px;
+    border-radius: 8px;
+    border: none;
+    background: var(--text-primary);
+    color: var(--bg-primary);
+    font-weight: 700;
+    font-size: 0.95rem;
+    cursor: pointer;
+    transition: transform 0.2s, opacity 0.2s;
+    margin-top: 8px;
+}
+
+.loginButton:hover {
+    opacity: 0.9;
+    transform: translateY(-1px);
+}
+
+.loginButton:active {
+    transform: translateY(0);
+}
+
+.signUpButton {
+    padding: 12px;
+    border-radius: 8px;
+    border: 1px solid var(--border-primary);
+    background: transparent;
+    color: var(--text-primary);
+    font-weight: 600;
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.signUpButton:hover {
+    background: var(--hover-bg);
+}

@@ -253,3 +253,38 @@
   width: 60%;
   margin: 12px 8px 6px 8px;
 }
+
+.authSection {
+  margin-top: auto; /* Push to bottom */
+  padding-top: 16px;
+  border-top: 1px solid var(--border-secondary);
+}
+
+.userInfo {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  margin-bottom: 4px;
+}
+
+.userAvatar {
+  width: 24px;
+  height: 24px;
+  background: var(--accent-surface);
+  color: var(--accent-primary);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.userEmail {
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  font-weight: 500;
+}
