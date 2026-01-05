@@ -1,0 +1,39 @@
+
+> zoom-board@0.1.0 lint
+> eslint
+
+
+C:\Users\johr9\Documents\git\ZoomBoard\src\app\notes\[id]\page.tsx
+  22:9  error  Error: Calling setState synchronously within an effect can trigger cascading renders
+
+Effects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:
+* Update external systems with the latest state from React.
+* Subscribe for updates from some external system, calling setState in a callback function when external state changes.
+
+Calling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).
+
+C:\Users\johr9\Documents\git\ZoomBoard\src\app\notes\[id]\page.tsx:22:9
+  20 |
+  21 |     useEffect(() => {
+> 22 |         setNote(notes.find(n => n.id === id));
+     |         ^^^^^^^ Avoid calling setState() directly within an effect
+  23 |     }, [notes, id]);
+  24 |
+  25 |     if (isLoading && !note) {  react-hooks/set-state-in-effect
+
+C:\Users\johr9\Documents\git\ZoomBoard\src\app\page.tsx
+   9:30  warning  'isLoading' is assigned a value but never used                   @typescript-eslint/no-unused-vars
+  32:72  error    `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`  react/no-unescaped-entities
+  32:77  error    `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`  react/no-unescaped-entities
+
+C:\Users\johr9\Documents\git\ZoomBoard\src\components\editor\PageEditor.tsx
+   70:40  warning  'slice' is defined but never used                                                                                @typescript-eslint/no-unused-vars
+  114:50  error    Unexpected any. Specify a different type                                                                         @typescript-eslint/no-explicit-any
+  149:53  error    Unexpected any. Specify a different type                                                                         @typescript-eslint/no-explicit-any
+  184:8   warning  React Hook useEffect has a missing dependency: 'note.content'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+
+C:\Users\johr9\Documents\git\ZoomBoard\src\store\useNoteStore.ts
+  50:19  warning  'createJSONStorage' is defined but never used  @typescript-eslint/no-unused-vars
+
+✖ 9 problems (5 errors, 4 warnings)
+

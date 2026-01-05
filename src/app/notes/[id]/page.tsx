@@ -3,24 +3,20 @@
 import { useParams } from 'next/navigation';
 import { useNoteStore } from '@/store/useNoteStore';
 import PageEditor from '@/components/editor/PageEditor';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useMemo } from 'react';
 import Sidebar from '@/components/layout/Sidebar';
 
 export default function NotePage() {
     const params = useParams();
     const id = params?.id as string;
     const { notes, isLoading, fetchNotes } = useNoteStore();
-    const [note, setNote] = useState(notes.find(n => n.id === id));
+    const note = useMemo(() => notes.find(n => n.id === id), [notes, id]);
 
     useEffect(() => {
         if (notes.length === 0 && !isLoading) {
             fetchNotes();
         }
     }, [notes.length, isLoading, fetchNotes]);
-
-    useEffect(() => {
-        setNote(notes.find(n => n.id === id));
-    }, [notes, id]);
 
     if (isLoading && !note) {
         return (

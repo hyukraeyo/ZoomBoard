@@ -22,6 +22,8 @@ import { useEffect } from 'react';
 import Image from '@tiptap/extension-image';
 import { supabase } from '@/lib/supabaseClient';
 import { v4 as uuidv4 } from 'uuid';
+import { EditorView } from '@tiptap/pm/view';
+import { Node as ProsemirrorNode } from '@tiptap/pm/model';
 
 const extensions = [
     Document,
@@ -111,7 +113,7 @@ export default function PageEditor({ note }: PageEditorProps) {
         immediatelyRender: false,
     });
 
-    const uploadImage = async (file: File, view: any) => {
+    const uploadImage = async (file: File, view: EditorView) => {
         const id = uuidv4();
         const blobUrl = URL.createObjectURL(file);
 
@@ -146,7 +148,7 @@ export default function PageEditor({ note }: PageEditorProps) {
             // Since doc might have changed, we scan for the node with our blobUrl.
             // Note: This scans the whole doc, efficient enough for normal blog posts.
             let foundPos = -1;
-            view.state.doc.descendants((descendant: any, pos: number) => {
+            view.state.doc.descendants((descendant: ProsemirrorNode, pos: number) => {
                 if (descendant.type.name === 'image' && descendant.attrs.src === blobUrl) {
                     foundPos = pos;
                     return false; // Stop iteration

@@ -6,7 +6,7 @@ import { useEffect, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
 
 export default function Home() {
-  const { notes, fetchNotes, isLoading } = useNoteStore();
+  const { notes, fetchNotes } = useNoteStore();
   const router = useRouter();
 
   useEffect(() => {
@@ -29,7 +29,7 @@ export default function Home() {
           {publishedNotes.length === 0 ? (
             <div style={{ textAlign: 'center', color: 'var(--text-secondary)', marginTop: 100 }}>
               <p>아직 게시된 글이 없습니다.</p>
-              <p style={{ fontSize: '0.9rem', marginTop: 8 }}>개인 페이지에서 '게시하기' 버튼을 눌러보세요.</p>
+              <p style={{ fontSize: '0.9rem', marginTop: 8 }}>개인 페이지에서 &apos;게시하기&apos; 버튼을 눌러보세요.</p>
             </div>
           ) : (
             <div style={{

@@ -1,6 +1,6 @@
 .sidebar {
   width: 240px;
-  height: 100%;
+  height: 100vh;
   background-color: #f7f7f5;
   color: #5f5e5b;
   display: flex;
@@ -10,34 +10,58 @@
   font-family: ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, "Apple Color Emoji", Arial, sans-serif, "Segoe UI Emoji", "Segoe UI Symbol";
   z-index: 100;
   flex-shrink: 0;
-  /* Natural easing for sliding */
-  transition: margin-left 0.3s cubic-bezier(0.25, 0.1, 0.25, 1.0), opacity 0.3s cubic-bezier(0.25, 0.1, 0.25, 1.0);
-  will-change: margin-left, opacity;
   position: relative;
-  height: 100vh;
+  
+  /* Transition settings for smooth width/push animation */
+  transition: 
+    margin-left 0.3s cubic-bezier(0.2, 0, 0, 1), 
+    transform 0.3s cubic-bezier(0.2, 0, 0, 1),
+    box-shadow 0.3s ease,
+    border-radius 0.3s ease,
+    visibility 0s linear 0s;
+  
+  will-change: margin-left, transform;
+  
+  /* Default state is "Locked" (Open, In-Flow) */
+  margin-left: 0;
+  transform: translateX(0);
 }
 
-.floating {
-  position: fixed;
-  top: 48px;
-  left: 12px;
-  height: auto;
+/* Floating State: Open but not pushing content */
+.sidebar.floating {
+  margin-left: -240px; /* Stay "out of flow" layout-wise */
+  transform: translateX(240px); /* Visual position */
+  
+  /* Panel Styling - Compact */
+  height: fit-content !important;
+  min-height: unset !important;
+  margin-top: 44px; /* Below the top header bar */
   max-height: calc(100vh - 60px);
-  border-radius: 6px;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+  padding: 8px 8px 12px 8px; /* 패딩 조정 */
+
+  border-radius: 0 8px 8px 0; /* Soft rounded right edge */
+  box-shadow: 2px 0 16px rgba(0, 0, 0, 0.08); /* Soft diffuse shadow */
+  border: 1px solid rgba(55, 53, 47, 0.08);
+  border-left: none;
   z-index: 999;
-  border: 1px solid rgba(55, 53, 47, 0.09);
-  background-color: #f7f7f5;
+  background-color: rgba(251, 251, 250, 0.98);
+  overflow-y: auto;
 }
 
+/* Closed State: Hidden off-screen */
 .sidebar.closed {
   margin-left: -240px;
-  opacity: 0;
+  transform: translateX(0);
+  visibility: hidden;
+  transition: 
+    margin-left 0.3s cubic-bezier(0.2, 0, 0, 1), 
+    transform 0.3s cubic-bezier(0.2, 0, 0, 1),
+    visibility 0s linear 0.3s;
 }
 
 .header {
-  padding: 8px;
-  margin-bottom: 16px;
+  padding: 14px 14px 8px 14px;
+  /* margin-bottom removed to bring visual tighter */
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -45,21 +69,40 @@
   color: #37352f;
   font-weight: 500;
   font-size: 14px;
+  /* Notion header is often sticky, but here we just style it */
 }
 
+/* User Profile mimics the workspace switcher */
 .userProfile {
   display: flex;
   align-items: center;
   gap: 8px;
+  cursor: pointer;
+  padding: 4px 6px;
+  border-radius: 4px;
+  transition: background-color 0.1s ease;
+  flex-grow: 1; /* Take up space for click target */
+  width: fit-content;
+}
+
+.userProfile:hover {
+  background-color: rgba(55, 53, 47, 0.08); /* Hover effect like Notion */
 }
 
 .closeButton {
-  opacity: 0;
+  /* opacity: 0; REMOVE opacity 0 to make it always accessible or follow isLocked logic in TSX */
+  /* If sidebar is hovering, we want visible controls usually. 
+     But let's stick to "hover to see" if desired, OR make it always visible like screenshot 
+     Screenshot shows icons present. */
+  opacity: 1; 
   color: #9b9a97;
   cursor: pointer;
   padding: 4px;
   border-radius: 4px;
   transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .sidebar:hover .closeButton {
@@ -176,4 +219,40 @@
 
 .deleteItem:hover {
   background-color: rgba(235, 87, 87, 0.1);
+}
+@keyframes shimmer {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+.skeleton {
+  background: linear-gradient(90deg, #ecebeb 25%, #f3f2f2 50%, #ecebeb 75%);
+  background-size: 200% 100%;
+  animation: shimmer 2s infinite ease-in-out;
+  border-radius: 4px;
+}
+
+.skeletonItem {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 8px;
+  height: 30px;
+}
+
+.skeletonIcon {
+  width: 16px;
+  height: 16px;
+  flex-shrink: 0;
+}
+
+.skeletonText {
+  height: 10px;
+  flex: 1;
+}
+
+.skeletonTitle {
+  height: 12px;
+  width: 60%;
+  margin: 12px 8px 6px 8px;
 }
