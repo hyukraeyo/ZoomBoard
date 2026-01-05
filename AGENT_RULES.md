@@ -1,41 +1,38 @@
-# Agent Operational Rules & Protocols
-These rules define the operating procedures for Autonomous Agents working on this project.
+# 에이전트 운영 규칙 및 프로토콜 (Agent Rules)
 
-## 1. Core Philosophy: "Performance, Beauty & Discoverability"
-- **Zero Compromise**: Every feature must be both highly performant (Core Web Vitals) and visually premium.
-- **User Experience**: Transition states (loading, error, empty) must be designed first, not last.
-- **SEO Mandatory**: All public pages must include proper Metadata, OpenGraph tags, and Semantic HTML.
+이 규칙은 본 프로젝트에서 작업하는 자율 에이전트(Autonomous Agent)의 운영 절차를 정의합니다.
 
-### SEO Rules:
-- **Core Web Vitals**: Target LCP under 2.5s and CLS under 0.1.
-- **Semantic Structure**: Use `h1` for titles (only once per page), followed by logical `h2-h6` hierarchy.
-- **Structured Data**: Implement JSON-LD for rich snippets where applicable.
-- **Next.js Power**: Prefer SSR/SSG for content-heavy sections to ensure immediate indexing.
+## 1. 핵심 철학: "성능, 미학, 그리고 발견 가능성"
+- **타협 없음 (Zero Compromise)**: 모든 기능은 고성능(LCP 2.5초 미만, CLS 0.1 미만)과 프리미엄 디자인(사용자를 감동시키는 "The Wow Factor")을 동시에 만족해야 합니다.
+- **사용자 경험 우선 (UX First)**: 로딩, 에러, 빈 상태 등의 트랜지션 상태를 가장 먼저 설계해야 합니다.
+- **SEO 필수 (SEO Mandatory)**: 모든 공개 페이지에는 적절한 메타데이터, OpenGraph 태그, 시맨틱 HTML, 구조화 데이터(JSON-LD)가 필수적으로 포함되어야 합니다.
 
-## 2. Interaction Protocol
-- **Acknowledge Context**: Always read `.cursorrules` before generating code.
-- **No Placeholders**: Never use `// TODO: implement this` or `lorem ipsum`. Generate real, working logic and realistic text.
-- **Self-Correction**: If a tool fails (e.g., `run_command`), analyze the `stderr` immediately and retry with a fix. Do not ask the user unless blocked.
+## 2. 상호작용 프로토콜
+- **맥락 인지**: 코드를 생성하기 전에 항상 `.cursorrules`를 읽고 숙지해야 합니다.
+- **플레이스홀더 금지**: `// TODO: 구현 필요` 또는 `lorem ipsum`과 같은 임시 텍스트를 절대 사용하지 마십시오. 실제 동작하는 로직과 현실적인 텍스트를 생성하십시오.
+- **자가 수정 (Self-Correction)**: 도구 실행(예: `run_command`)이 실패하면, 즉시 에러 로그(`stderr`)를 분석하고 수정하여 재시도하십시오. 차단되지 않는 한 사용자에게 묻지 말고 스스로 해결하십시오.
 
-## 3. Workflow Standards
+## 3. 워크플로우 표준
 
-### A. Feature Implementation
-1. **Analyze**: Understand requirements ~> Check existing patterns in `src/`.
-2. **Style check**: ensure strictly NO Tailwind.
-3. **Draft**: Create CSS Modules first (`Component.module.css`), then the React Component (`Component.tsx`).
-4. **Verify**: Ensure fully responsive on Mobile (320px) to Desktop (1920px).
-5. **Data Flow**: Handle all data fetching/processing at the **Page Level**. Pass data down as props. Keep components pure.
+### A. 기능 구현 (Feature Implementation)
+1. **분석**: 요구사항을 이해하고 `src/` 내의 기존 패턴을 확인합니다.
+2. **스타일 체크**: Tailwind CSS는 절대 사용하지 않습니다 (Strictly NO Tailwind).
+3. **초안 작성**: CSS Modules(`Component.module.css`)를 먼저 작성한 후, React 컴포넌트(`Component.tsx`)를 작성합니다.
+4. **검증**: 모바일(320px)부터 데스크톱(1920px)까지 완벽하게 반응형으로 동작하는지 확인합니다.
+5. **데이터 흐름**: 모든 데이터 페칭 및 처리는 **페이지 레벨(Top-Level Container)** 에서 수행합니다. 자식 컴포넌트는 Props로만 데이터를 받으며 순수함을 유지해야 합니다.
+6. **상태 지속성 (UI Persistence)**: 사이드바 토글, 다크 모드 등 레이아웃에 영향을 주는 UI 상태는 반드시 **쿠키(Cookie)** 에 저장하여, 서버 사이드 렌더링(SSR) 시 HTML과 동기화되도록 해야 합니다(FOUC 방지).
+7. **하이드레이션 (Hydration)**: 초기 데이터 로딩으로 인한 깜빡임을 방지하기 위해, 가능한 한 서버 컴포넌트에서 데이터를 미리 가져와 클라이언트 스토어에 주입(Hydrate)하는 패턴을 사용하십시오.
 
-### B. Refactoring Code
-1. **Safety**: Run type checks (`tsc --noEmit`) before confirming changes.
-2. **Performance**: Check bundle size implications (import only what is needed).
-3. **Modernization**: Convert old React patterns (`useEffect` for data fetching) to Server Actions/Server Components.
+### B. 코드 리팩토링 (Refactoring)
+1. **안전성**: 변경 사항을 확정하기 전에 타입 체크(`tsc --noEmit`)를 실행합니다.
+2. **성능**: 번들 크기에 미치는 영향을 확인합니다 (필요한 것만 import).
+3. **현대화**: 오래된 React 패턴(데이터 페칭에 `useEffect` 사용 등)을 서버 액션(Server Actions) 또는 서버 컴포넌트(Server Components)로 전환합니다.
 
-## 4. Environment Safety
-- **Secrets**: Never hardcode API keys. Use `process.env`.
-- **Destructive Actions**: Ask for confirmation before `rm -rf` on non-generated folders.
-- **Package Management**: Use `npm`. Do not mix with `yarn` or `pnpm`.
+## 4. 환경 안전 수칙
+- **비밀 관리**: API 키를 절대 코드에 하드코딩하지 마십시오. `process.env`를 사용하십시오.
+- **파괴적 작업**: 생성되지 않은 폴더에 대해 `rm -rf`와 같은 명령을 실행하기 전에 사용자 확인을 받으십시오.
+- **패키지 관리**: `npm`을 사용하십시오. `yarn`이나 `pnpm`과 혼용하지 마십시오.
 
-## 5. Communication Style
-- **Concise**: Technical and direct.
-- **Educational**: Briefly explain *why* a certain optimization (e.g., "Using React Compiler here...") was chosen.
+## 5. 커뮤니케이션 스타일
+- **간결함**: 기술적이고 직접적으로 소통합니다.
+- **교육적**: 특정 최적화(예: "여기서 React Compiler를 활용하기 위해...")를 선택한 이유를 간략히 설명합니다.

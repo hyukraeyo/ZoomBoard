@@ -7,7 +7,11 @@ import { useMemo, useState, useEffect } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
 import TrashPopover from './TrashPopover';
 
-export default function Sidebar() {
+interface SidebarProps {
+    initialIsOpen?: boolean;
+}
+
+export default function Sidebar({ initialIsOpen }: SidebarProps) {
     const {
         notes,
         setFocusedNoteId,
@@ -26,6 +30,15 @@ export default function Sidebar() {
     const [trashOpen, setTrashOpen] = useState(false);
     const [trashPosition, setTrashPosition] = useState({ top: 0, left: 0 });
     const [isHoveringTrigger, setIsHoveringTrigger] = useState(false);
+
+    // Hydration Mismatch Fix:
+    // 서버 사이드 및 첫 렌더링 시에는 쿠키에서 가져온 initialIsOpen 값을 우선 사용
+    // 마운트 이후에는 zustand store의 live state를 사용
+    const [isMounted, setIsMounted] = useState(false);
+    // eslint-disable-next-line
+    useEffect(() => setIsMounted(true), []);
+
+    const sidebarState = isMounted ? isSidebarOpen : (initialIsOpen ?? true);
 
     // Sort notes by Creation time for the list (Newest first)
     // or you might want Alphabetical. let's go with CreatedAt for now.
@@ -94,8 +107,13 @@ export default function Sidebar() {
     const currentNoteTitle = useMemo(() => {
         if (pathname === '/') return '홈 (Home)';
         if (!focusedNoteId || !pathname.startsWith('/notes/')) return null;
+
         const note = notes.find(n => n.id === focusedNoteId);
-        return note?.title || '새 페이지';
+        // 노트가 아직 로드되지 않았으면(undefined) 아무것도 표시하지 않음 (깜빡임 방지)
+        if (!note) return null;
+
+        // 노트는 있는데 제목이 비어있으면 '새 페이지'
+        return note.title || '새 페이지';
     }, [focusedNoteId, notes, pathname]);
 
     return (
@@ -227,18 +245,20 @@ export default function Sidebar() {
                 </div>
             </div>
 
+
+
             <aside
                 className={`
                     ${styles.sidebar} 
                     ${!isLocked ? styles.floating : ''} 
-                    ${!isSidebarOpen ? styles.closed : ''}
+                    ${!sidebarState ? styles.closed : ''}
                 `.trim()}
                 onMouseLeave={() => {
                     if (!isLocked) setIsSidebarOpen(false);
                 }}
             >
-                {/* 상단 여백 (아이콘 위치 확보 - 검색 메뉴와 겹침 방지) */}
-                <div style={{ height: 44 }} />
+                {/* 상단 여백 (고정 모드일 때만 헤더 높이만큼 확보, 플로팅일 때는 조금만) */}
+                <div style={{ height: isLocked ? 44 : 12 }} />
 
                 <div className={styles.noteItem}>
                     <Search size={16} className={styles.icon} />

@@ -1,6 +1,11 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
+import { createClient } from "@supabase/supabase-js";
+import NoteInitializer from "@/components/providers/NoteInitializer";
+import { Note } from "@/store/useNoteStore";
+import { cookies } from "next/headers";
+import Sidebar from "@/components/layout/Sidebar";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -38,11 +43,49 @@ const jsonLd = {
   }
 };
 
-export default function RootLayout({
+// Initialize Supabase Client for Server Side Data Fetching
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
+const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
+const supabaseServer = createClient(supabaseUrl, supabaseAnonKey);
+
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  // 🍪 Read Cookie for Sidebar State
+  const cookieStore = await cookies();
+  const sidebarOpenCookie = cookieStore.get('sidebar_open');
+  const isSidebarOpen = sidebarOpenCookie ? sidebarOpenCookie.value === 'true' : true;
+
+  // 🚀 Server Side Data Fetching
+  // ... (keep creating initialNotes logic from previous file content)
+  let initialNotes: Note[] = [];
+  try {
+    const { data } = await supabaseServer
+      .from('notes')
+      .select('*')
+      .is('deleted_at', null)
+      .order('z_index', { ascending: true });
+
+    if (data) {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      initialNotes = data.map((n: any) => ({
+        id: n.id,
+        x: n.x,
+        y: n.y,
+        title: n.title,
+        content: n.content,
+        createdAt: n.created_at ? Number(n.created_at) : 0,
+        zIndex: n.z_index,
+        deletedAt: n.deleted_at ? Number(n.deleted_at) : null,
+        isPublished: n.is_published || false,
+      }));
+    }
+  } catch (e) {
+    console.error("Failed to fetch initial notes on server", e);
+  }
+
   return (
     <html lang="en" suppressHydrationWarning>
       <head>
@@ -52,7 +95,11 @@ export default function RootLayout({
         />
       </head>
       <body className={`${geistSans.variable} ${geistMono.variable}`} suppressHydrationWarning>
-        {children}
+        <NoteInitializer notes={initialNotes} isSidebarOpen={isSidebarOpen} />
+        <div style={{ display: 'flex', width: '100vw', height: '100vh', overflow: 'hidden' }}>
+          <Sidebar initialIsOpen={isSidebarOpen} />
+          {children}
+        </div>
       </body>
     </html>
   );

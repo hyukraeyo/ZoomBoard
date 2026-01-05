@@ -45,9 +45,10 @@ interface NoteState {
     setIsSidebarOpen: (isOpen: boolean) => void;
     isLocked: boolean;
     setIsLocked: (isLocked: boolean) => void;
+    setNotes: (notes: Note[]) => void;
 }
 
-import { persist, createJSONStorage } from 'zustand/middleware';
+import { persist } from 'zustand/middleware';
 
 export const useNoteStore = create<NoteState>()(
     persist(
@@ -57,6 +58,7 @@ export const useNoteStore = create<NoteState>()(
             isLoading: false,
             isSidebarOpen: true,
             isLocked: true,
+            setNotes: (notes) => set({ notes }),
 
             fetchNotes: async () => {
                 set({ isLoading: true });
@@ -309,7 +311,10 @@ export const useNoteStore = create<NoteState>()(
             setFocusedNoteId: (id) => set({ focusedNoteId: id }),
 
 
-            setIsSidebarOpen: (isOpen) => set({ isSidebarOpen: isOpen }),
+            setIsSidebarOpen: (isOpen) => {
+                set({ isSidebarOpen: isOpen });
+                document.cookie = `sidebar_open=${isOpen}; path=/; max-age=31536000`; // 1 year
+            },
             setIsLocked: (isLocked) => set({ isLocked: isLocked }),
         }),
         {
@@ -317,9 +322,7 @@ export const useNoteStore = create<NoteState>()(
             partialize: (state) => ({
                 isSidebarOpen: state.isSidebarOpen,
                 isLocked: state.isLocked,
-
-                // optionally persist focused note? user said "unconditionally", let's do it.
-                focusedNoteId: state.focusedNoteId
+                // focusedNoteId is NOT persisted to avoid flashing old title on reload
             }),
         }
     )

@@ -18,7 +18,7 @@ import Dropcursor from '@tiptap/extension-dropcursor';
 import styles from './PageEditor.module.css';
 import { useNoteStore, Note } from '@/store/useNoteStore';
 import { useEditor, EditorContent } from '@tiptap/react';
-import { useEffect } from 'react';
+
 import Image from '@tiptap/extension-image';
 import { supabase } from '@/lib/supabaseClient';
 import { v4 as uuidv4 } from 'uuid';
@@ -69,7 +69,7 @@ export default function PageEditor({ note }: PageEditorProps) {
             attributes: {
                 class: styles.content,
             },
-            handlePaste: (view, event, slice) => {
+            handlePaste: (view, event) => {
                 const item = event.clipboardData?.items[0];
                 if (item?.type.indexOf('image') === 0) {
                     event.preventDefault();
@@ -175,15 +175,7 @@ export default function PageEditor({ note }: PageEditorProps) {
     // Be careful not to create infinite loops or reset cursor position while typing
     // For now, only update if the editor is empty or on mount.
     // Complex real-time collaboration needs Y.js, but for local-first single user:
-    useEffect(() => {
-        if (editor && note.content && editor.getHTML() !== note.content) {
-            // Only update if completely different? 
-            // Actually, with local state, we rely on onUpdate to push changes.
-            // We shouldn't pull changes back unless we implement Undo/Redo via store or something.
-            // But if we switch notes, the component remounts, so new content is loaded via initialContent.
-            // So this useEffect might not be needed if key={note.id} is used on the parent.
-        }
-    }, [note.id, editor]);
+
 
     if (!editor) {
         return null;

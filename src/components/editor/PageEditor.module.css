@@ -5,7 +5,7 @@
   display: flex;
   justify-content: center;
   overflow-y: auto;
-  background-color: var(--bg-primary, #ffffff); /* Match application background */
+  background-color: transparent;
 }
 
 .editorWrapper {
