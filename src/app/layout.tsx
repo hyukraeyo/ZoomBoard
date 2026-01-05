@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { createClient } from "@supabase/supabase-js";
@@ -30,7 +30,6 @@ export const metadata: Metadata = {
   description: "Next.js기반의 고성능 인터랙티브 무한 캔버스 보드. 기술적 SEO와 사용자 경험(UX)이 최적화된 협업 도구.",
   keywords: ["Next.js", "React Compiler", "SEO Optimization", "Infinite Canvas", "Collaboration Tool"],
   authors: [{ name: "ZoomBoard Team" }],
-  viewport: "width=device-width, initial-scale=1",
   robots: "index, follow",
   icons: {
     icon: "/favicon.ico",
@@ -48,6 +47,11 @@ export const metadata: Metadata = {
     title: "ZoomBoard | Interactive Canvas",
     description: "High performance interactive infinite canvas",
   },
+};
+
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
 };
 
 const jsonLd = {

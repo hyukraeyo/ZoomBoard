@@ -1,7 +1,4 @@
 import { createClient } from "@supabase/supabase-js";
-import NoteInitializer from "@/components/providers/NoteInitializer";
-import { Note } from "@/store/useNoteStore";
-import { useMemo } from "react";
 import Link from "next/link";
 
 // Initialize Supabase Client for Server Side Data Fetching

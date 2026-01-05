@@ -1,7 +1,5 @@
 import { createClient } from "@supabase/supabase-js";
 import { Metadata } from "next";
-import dynamic from "next/dynamic";
-import { useMemo } from "react";
 
 import ClientNotePage from "./ClientNotePage";
 
