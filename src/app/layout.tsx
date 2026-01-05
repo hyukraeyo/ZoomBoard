@@ -6,6 +6,7 @@ import NoteInitializer from "@/components/providers/NoteInitializer";
 import { Note } from "@/store/useNoteStore";
 import { cookies } from "next/headers";
 import Sidebar from "@/components/layout/Sidebar";
+import ThemeToggle from "@/components/common/ThemeToggle";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -53,10 +54,13 @@ export default async function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  // 🍪 Read Cookie for Sidebar State
+  // 🍪 Read Cookies for UI State
   const cookieStore = await cookies();
   const sidebarOpenCookie = cookieStore.get('sidebar_open');
   const isSidebarOpen = sidebarOpenCookie ? sidebarOpenCookie.value === 'true' : true;
+
+  const themeCookie = cookieStore.get('theme');
+  const theme = themeCookie ? themeCookie.value : 'light';
 
   // 🚀 Server Side Data Fetching
   // ... (keep creating initialNotes logic from previous file content)
@@ -87,8 +91,23 @@ export default async function RootLayout({
   }
 
   return (
-    <html lang="en" suppressHydrationWarning>
+    <html lang="en" data-theme={theme} suppressHydrationWarning>
       <head>
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `
+              (function() {
+                try {
+                  var theme = document.cookie.split('; ').find(row => row.startsWith('theme='))?.split('=')[1];
+                  if (!theme) {
+                    theme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+                  }
+                  document.documentElement.setAttribute('data-theme', theme);
+                } catch (e) {}
+              })();
+            `,
+          }}
+        />
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
@@ -100,6 +119,7 @@ export default async function RootLayout({
           <Sidebar initialIsOpen={isSidebarOpen} />
           {children}
         </div>
+        <ThemeToggle />
       </body>
     </html>
   );

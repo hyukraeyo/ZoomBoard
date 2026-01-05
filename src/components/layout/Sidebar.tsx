@@ -177,7 +177,7 @@ export default function Sidebar({ initialIsOpen }: SidebarProps) {
                             }
                         }}
                         onMouseEnter={(e) => {
-                            e.currentTarget.style.backgroundColor = 'rgba(55, 53, 47, 0.08)';
+                            e.currentTarget.style.backgroundColor = 'var(--hover-bg)';
                         }}
                         onMouseLeave={(e) => {
                             e.currentTarget.style.backgroundColor = 'transparent';
@@ -195,7 +195,7 @@ export default function Sidebar({ initialIsOpen }: SidebarProps) {
                             transition: 'all 0.2s ease',
                             display: 'flex',
                         }}>
-                            <ChevronsLeft size={16} color="#9b9a97" />
+                            <ChevronsLeft size={16} color="var(--text-tertiary)" />
                         </div>
                         {/* 2. Floating/Hover State: ChevronsRight */}
                         <div style={{
@@ -209,7 +209,7 @@ export default function Sidebar({ initialIsOpen }: SidebarProps) {
                             transition: 'all 0.2s ease',
                             display: 'flex',
                         }}>
-                            <ChevronsRight size={16} color="#9b9a97" />
+                            <ChevronsRight size={16} color="var(--text-tertiary)" />
                         </div>
                         {/* 3. Closed State: Menu */}
                         <div style={{
@@ -223,7 +223,7 @@ export default function Sidebar({ initialIsOpen }: SidebarProps) {
                             transition: 'all 0.2s ease',
                             display: 'flex',
                         }}>
-                            <Menu size={16} color="#9b9a97" />
+                            <Menu size={16} color="var(--text-tertiary)" />
                         </div>
                     </div>
 
@@ -231,7 +231,7 @@ export default function Sidebar({ initialIsOpen }: SidebarProps) {
                     {currentNoteTitle && (
                         <span style={{
                             fontSize: 14,
-                            color: '#37352f',
+                            color: 'var(--text-primary)',
                             fontWeight: 500,
                             whiteSpace: 'nowrap',
                             overflow: 'hidden',
