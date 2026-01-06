@@ -1,5 +1,7 @@
 'use client';
 
+const isDev = typeof process !== 'undefined' && process.env?.NODE_ENV === 'development';
+
 import Document from '@tiptap/extension-document';
 import Paragraph from '@tiptap/extension-paragraph';
 import Text from '@tiptap/extension-text';
@@ -44,7 +46,6 @@ const extensions = [
     OrderedList,
     ListItem,
     CodeBlock,
-    Blockquote,
     Blockquote,
     History,
     Dropcursor.configure({
@@ -169,7 +170,9 @@ export default function PageEditor({ note, editable = true }: PageEditorProps) {
                 .upload(filePath, file);
 
             if (uploadError) {
-                console.error('Error uploading image:', uploadError);
+                if (isDev) {
+                    console.error('Error uploading image:', uploadError);
+                }
                 // Optionally remove the blob image here if failed
                 return;
             }
@@ -202,7 +205,9 @@ export default function PageEditor({ note, editable = true }: PageEditorProps) {
             // (Optional: keep it for a bit if needed or revoke instantly. Revoking instantly usually holds frame.)
 
         } catch (error) {
-            console.error('Upload failed:', error);
+            if (isDev) {
+                console.error('Upload failed:', error);
+            }
         }
     };
 

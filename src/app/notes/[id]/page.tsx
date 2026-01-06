@@ -2,6 +2,7 @@ import { createClient } from "@supabase/supabase-js";
 import { Metadata } from "next";
 
 import ClientNotePage from "./ClientNotePage";
+import EmptyState from "@/components/common/EmptyState";
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
 const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
@@ -43,11 +44,9 @@ export default async function NotePage({ params }: { params: Promise<{ id: strin
 
     if (!note || note.deleted_at) {
         return (
-            <div style={{ flex: 1, display: 'flex', justifyContent: 'center', alignItems: 'center', width: '100%', height: '100%', color: 'var(--text-secondary)' }}>
-                <div style={{ textAlign: 'center' }}>
-                    <h2 style={{ marginBottom: 8 }}>존재하지 않거나 삭제된 페이지입니다.</h2>
-                </div>
-            </div>
+            <EmptyState
+                title="존재하지 않거나 삭제된 페이지입니다."
+            />
         );
     }
 

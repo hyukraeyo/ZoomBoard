@@ -1,6 +1,7 @@
 import { create } from 'zustand';
 import { supabase } from '@/lib/supabaseClient';
 import { User, Session } from '@supabase/supabase-js';
+import { useNoteStore } from './useNoteStore';
 
 interface AuthState {
     user: User | null;
@@ -23,6 +24,9 @@ export const useAuthStore = create<AuthState>((set, get) => ({
     signOut: async () => {
         await supabase.auth.signOut();
         set({ user: null, session: null });
+        // Clear notes when signing out
+        useNoteStore.getState().setNotes([]);
+        useNoteStore.getState().setIsInitialized(false);
     },
     initialize: async () => {
         if (get().hasInitialized) return;

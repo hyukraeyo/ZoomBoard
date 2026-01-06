@@ -168,3 +168,102 @@ body {
   box-shadow: 0 10px 20px rgba(0,0,0,0.1);
   border-color: var(--accent-primary);
 }
+
+/* ===== 성능 최적화 ===== */
+
+/* GPU 가속화 및 성능 최적화 */
+* {
+  /* 하드웨어 가속화 */
+  transform: translateZ(0);
+  backface-visibility: hidden;
+  perspective: 1000px;
+}
+
+/* 스크롤 성능 최적화 */
+html {
+  scroll-behavior: smooth;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* 이미지 로딩 최적화 */
+img {
+  /* 이미지 로딩 성능 */
+  image-rendering: -webkit-optimize-contrast;
+  image-rendering: crisp-edges;
+}
+
+/* 애니메이션 성능 최적화 - transform과 opacity만 사용 */
+.smooth-transition {
+  transition: transform 0.2s ease, opacity 0.2s ease;
+}
+
+/* 메모리 사용 최적화 */
+.lazy-load {
+  content-visibility: auto;
+  contain-intrinsic-size: 0 200px;
+}
+
+/* 텍스트 렌더링 최적화 */
+.text-optimized {
+  text-rendering: optimizeLegibility;
+  font-feature-settings: "kern" 1, "liga" 1;
+}
+
+/* 포커스 성능 최적화 */
+:focus-visible {
+  outline: 2px solid var(--accent-primary);
+  outline-offset: 2px;
+}
+
+/* 리플로우 최소화 */
+.no-reflow {
+  contain: layout style paint;
+}
+
+/* ===== 반응형 이미지 ===== */
+.responsive-img {
+  max-width: 100%;
+  height: auto;
+  display: block;
+}
+
+/* ===== 로딩 상태 최적화 ===== */
+.loading-skeleton {
+  background: linear-gradient(90deg, var(--bg-tertiary) 25%, transparent 50%, var(--bg-tertiary) 75%);
+  background-size: 200% 100%;
+  animation: loading 1.5s infinite;
+}
+
+@keyframes loading {
+  0% {
+    background-position: 200% 0;
+  }
+  100% {
+    background-position: -200% 0;
+  }
+}
+
+/* ===== 접근성 및 SEO 최적화 ===== */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* ===== Web Vitals 최적화 ===== */
+.cumulative-layout-shift {
+  /* CLS 방지 */
+  contain: layout style;
+}
+
+.largest-contentful-paint {
+  /* LCP 최적화 */
+  content-visibility: auto;
+}

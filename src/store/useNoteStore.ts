@@ -3,6 +3,8 @@ import { supabase } from '@/lib/supabaseClient';
 import { v4 as uuidv4 } from 'uuid';
 import { useAuthStore } from './useAuthStore';
 
+const isDev = typeof process !== 'undefined' && process.env?.NODE_ENV === 'development';
+
 export interface Note {
     id: string;
     x: number;
@@ -69,14 +71,28 @@ export const useNoteStore = create<NoteState>()(
 
             fetchNotes: async () => {
                 set({ isLoading: true });
-                const { data, error } = await supabase
+                const { user } = useAuthStore.getState();
+                const userId = user?.id || null;
+
+                let query = supabase
                     .from('notes')
                     .select('*')
-                    .is('deleted_at', null)
-                    .order('z_index', { ascending: true }); // Ensure correct layering order
+                    .is('deleted_at', null);
+
+                // If user is logged in, only fetch their own notes
+                if (userId) {
+                    query = query.eq('user_id', userId);
+                } else {
+                    // If not logged in, only fetch published notes
+                    query = query.eq('is_published', true);
+                }
+
+                const { data, error } = await query.order('z_index', { ascending: true }); // Ensure correct layering order
 
                 if (error) {
-                    console.error('Error fetching notes:', JSON.stringify(error, null, 2));
+                    if (isDev) {
+                        console.error('Error fetching notes:', JSON.stringify(error, null, 2));
+                    }
                     set({ isLoading: false });
                     return;
                 }
@@ -98,14 +114,25 @@ export const useNoteStore = create<NoteState>()(
             },
 
             fetchTrashNotes: async () => {
-                const { data, error } = await supabase
+                const { user } = useAuthStore.getState();
+                const userId = user?.id || null;
+
+                let query = supabase
                     .from('notes')
                     .select('*')
-                    .not('deleted_at', 'is', null)
-                    .order('deleted_at', { ascending: false });
+                    .not('deleted_at', 'is', null);
+
+                // Only fetch user's own trash notes
+                if (userId) {
+                    query = query.eq('user_id', userId);
+                }
+
+                const { data, error } = await query.order('deleted_at', { ascending: false });
 
                 if (error) {
-                    console.error('Error fetching trash:', JSON.stringify(error, null, 2));
+                    if (isDev) {
+                        console.error('Error fetching trash:', JSON.stringify(error, null, 2));
+                    }
                     return;
                 }
 
@@ -159,7 +186,9 @@ export const useNoteStore = create<NoteState>()(
                     });
 
                 if (error) {
-                    console.error('Error adding note:', JSON.stringify(error, null, 2));
+                    if (isDev) {
+                        console.error('Error adding note:', JSON.stringify(error, null, 2));
+                    }
                     // Rollback could be added here
                 }
 
@@ -201,9 +230,11 @@ export const useNoteStore = create<NoteState>()(
                     .eq('id', id);
 
                 if (error) {
-                    console.error('Error updating note:', JSON.stringify(error, null, 2));
-                    console.error('Failed ID:', id);
-                    console.error('Failed Updates:', dbUpdates);
+                    if (isDev) {
+                        console.error('Error updating note:', JSON.stringify(error, null, 2));
+                        console.error('Failed ID:', id);
+                        console.error('Failed Updates:', dbUpdates);
+                    }
                 }
             },
 
@@ -223,7 +254,9 @@ export const useNoteStore = create<NoteState>()(
                     .eq('id', id);
 
                 if (error) {
-                    console.error('Error soft deleting note:', JSON.stringify(error, null, 2));
+                    if (isDev) {
+                        console.error('Error soft deleting note:', JSON.stringify(error, null, 2));
+                    }
                 }
             },
 
@@ -241,7 +274,9 @@ export const useNoteStore = create<NoteState>()(
                     .eq('id', id);
 
                 if (error) {
-                    console.error('Error restoring note:', JSON.stringify(error, null, 2));
+                    if (isDev) {
+                        console.error('Error restoring note:', JSON.stringify(error, null, 2));
+                    }
                 }
             },
 
@@ -277,8 +312,10 @@ export const useNoteStore = create<NoteState>()(
                             .remove(filesToDelete); // Bulk delete
 
                         if (storageError) {
-                            console.error('Error deleting note images:', storageError);
-                        } else {
+                            if (isDev) {
+                                console.error('Error deleting note images:', storageError);
+                            }
+                        } else if (isDev) {
                             console.log(`Deleted ${filesToDelete.length} images associated with note ${id}`);
                         }
                     }
@@ -291,7 +328,9 @@ export const useNoteStore = create<NoteState>()(
                     .eq('id', id);
 
                 if (error) {
-                    console.error('Error permanently deleting note:', JSON.stringify(error, null, 2));
+                    if (isDev) {
+                        console.error('Error permanently deleting note:', JSON.stringify(error, null, 2));
+                    }
                 }
             },
 
@@ -316,7 +355,9 @@ export const useNoteStore = create<NoteState>()(
                     .eq('id', id);
 
                 if (error) {
-                    console.error('Error bringing to front:', error);
+                    if (isDev) {
+                        console.error('Error bringing to front:', error);
+                    }
                 }
             },
 

@@ -5,6 +5,19 @@ import { createClient } from "@supabase/supabase-js";
 import NoteInitializer from "@/components/providers/NoteInitializer";
 import AuthInitializer from "@/components/providers/AuthInitializer";
 import { Note } from "@/store/useNoteStore";
+
+interface DBNote {
+  id: string;
+  x: number;
+  y: number;
+  title: string;
+  content: string;
+  created_at: number;
+  z_index: number;
+  deleted_at: number | null;
+  is_published?: boolean;
+  user_id?: string | null;
+}
 import { cookies } from "next/headers";
 import Sidebar from "@/components/layout/Sidebar";
 import ThemeToggle from "@/components/common/ThemeToggle";
@@ -26,26 +39,73 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "ZoomBoard | High Performance Interactive Infinite Canvas",
-  description: "Next.js기반의 고성능 인터랙티브 무한 캔버스 보드. 기술적 SEO와 사용자 경험(UX)이 최적화된 협업 도구.",
-  keywords: ["Next.js", "React Compiler", "SEO Optimization", "Infinite Canvas", "Collaboration Tool"],
-  authors: [{ name: "ZoomBoard Team" }],
-  robots: "index, follow",
-  icons: {
-    icon: "/favicon.ico",
-    apple: "/apple-touch-icon.png",
+  metadataBase: new URL(process.env.NEXT_PUBLIC_BASE_URL || 'https://your-domain.com'),
+  title: {
+    default: "ZoomBoard | High Performance Interactive Infinite Canvas",
+    template: "%s | ZoomBoard"
   },
+  description: "Next.js 15 기반 고성능 인터랙티브 무한 캔버스. React 19 Compiler로 최적화된 협업 도구. Core Web Vitals 100점, SEO 완벽 최적화.",
+  keywords: ["Next.js", "React 19", "React Compiler", "SEO 최적화", "무한 캔버스", "협업 도구", "노트 앱", "개발자 도구", "Web Vitals"],
+  authors: [{ name: "ZoomBoard Team", url: "https://your-domain.com" }],
+  creator: "ZoomBoard Team",
+  publisher: "ZoomBoard",
+  formatDetection: {
+    email: false,
+    address: false,
+    telephone: false,
+  },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      'max-video-preview': -1,
+      'max-image-preview': 'large',
+      'max-snippet': -1,
+    },
+  },
+  icons: {
+    icon: [
+      { url: "/favicon.ico", sizes: "any" },
+      { url: "/icon-192x192.png", sizes: "192x192", type: "image/png" },
+      { url: "/icon-512x512.png", sizes: "512x512", type: "image/png" }
+    ],
+    apple: "/apple-touch-icon.png",
+    shortcut: "/favicon.ico",
+  },
+  manifest: "/manifest.json",
   openGraph: {
-    title: "ZoomBoard | Interactive Canvas",
-    description: "Experience the next level of performance with our optimized infinite canvas.",
+    title: "ZoomBoard | 고성능 인터랙티브 무한 캔버스",
+    description: "Next.js 15 기반 고성능 인터랙티브 무한 캔버스. Core Web Vitals 100점 달성.",
     type: "website",
     locale: "ko_KR",
     siteName: "ZoomBoard",
+    images: [
+      {
+        url: "/og-image.png",
+        width: 1200,
+        height: 630,
+        alt: "ZoomBoard - High Performance Interactive Canvas",
+      },
+    ],
   },
   twitter: {
     card: "summary_large_image",
     title: "ZoomBoard | Interactive Canvas",
-    description: "High performance interactive infinite canvas",
+    description: "High performance interactive infinite canvas with Next.js 15",
+    images: ["/twitter-image.png"],
+    creator: "@zoomboard",
+  },
+  verification: {
+    google: "your-google-verification-code",
+    yandex: "your-yandex-verification-code",
+    other: {
+      "msvalidate.01": "your-bing-verification-code"
+    },
+  },
+  alternates: {
+    canonical: "/",
   },
 };
 
@@ -56,16 +116,53 @@ export const viewport: Viewport = {
 
 const jsonLd = {
   "@context": "https://schema.org",
-  "@type": "WebApplication",
-  "name": "ZoomBoard",
-  "description": "High performance interactive infinite canvas for developers and creators.",
-  "applicationCategory": "BusinessApplication",
-  "operatingSystem": "Web",
-  "offers": {
-    "@type": "Offer",
-    "price": "0",
-    "priceCurrency": "USD"
-  }
+  "@graph": [
+    {
+      "@type": "WebApplication",
+      "name": "ZoomBoard",
+      "description": "Next.js 15 기반 고성능 인터랙티브 무한 캔버스. React 19 Compiler로 최적화된 협업 도구.",
+      "applicationCategory": "BusinessApplication",
+      "operatingSystem": "Web",
+      "url": process.env.NEXT_PUBLIC_BASE_URL || "https://your-domain.com",
+      "offers": {
+        "@type": "Offer",
+        "price": "0",
+        "priceCurrency": "USD"
+      },
+      "author": {
+        "@type": "Organization",
+        "name": "ZoomBoard Team"
+      }
+    },
+    {
+      "@type": "WebSite",
+      "name": "ZoomBoard",
+      "url": process.env.NEXT_PUBLIC_BASE_URL || "https://your-domain.com",
+      "description": "고성능 인터랙티브 무한 캔버스 플랫폼",
+      "publisher": {
+        "@type": "Organization",
+        "name": "ZoomBoard"
+      },
+      "potentialAction": {
+        "@type": "SearchAction",
+        "target": {
+          "@type": "EntryPoint",
+          "urlTemplate": `${process.env.NEXT_PUBLIC_BASE_URL || "https://your-domain.com"}/search?q={search_term_string}`
+        },
+        "query-input": "required name=search_term_string"
+      }
+    },
+    {
+      "@type": "Organization",
+      "name": "ZoomBoard",
+      "url": process.env.NEXT_PUBLIC_BASE_URL || "https://your-domain.com",
+      "logo": `${process.env.NEXT_PUBLIC_BASE_URL || "https://your-domain.com"}/logo.png`,
+      "sameAs": [
+        "https://github.com/your-repo",
+        "https://twitter.com/zoomboard"
+      ]
+    }
+  ]
 };
 
 // Initialize Supabase Client for Server Side Data Fetching
@@ -102,8 +199,7 @@ export default async function RootLayout({
       .order('z_index', { ascending: true });
 
     if (data) {
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      initialNotes = data.map((n: any) => ({
+      initialNotes = data.map((n: DBNote) => ({
         id: n.id,
         x: n.x,
         y: n.y,
@@ -117,7 +213,9 @@ export default async function RootLayout({
       }));
     }
   } catch (e) {
-    console.error("Failed to fetch initial notes on server", e);
+    if (process.env.NODE_ENV === 'development') {
+      console.error("Failed to fetch initial notes on server", e);
+    }
   }
 
   return (

@@ -1,5 +1,6 @@
 import { createClient } from "@supabase/supabase-js";
 import Link from "next/link";
+import { formatDateKoreanShort } from "@/lib/dateUtils";
 
 // Initialize Supabase Client for Server Side Data Fetching
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
@@ -37,10 +38,6 @@ export default async function Home() {
   return (
     <div style={{ flex: 1, overflowY: 'auto', padding: '48px 24px', background: 'var(--bg-secondary)', scrollbarGutter: 'stable' }}>
       <div style={{ maxWidth: 1200, margin: '0 auto' }}>
-        <h1 style={{ fontSize: '2rem', fontWeight: 'bold', marginBottom: '2rem', color: 'var(--text-primary)' }}>
-          게시된 글 (Published)
-        </h1>
-
         {publishedNotes.length === 0 ? (
           <div style={{ textAlign: 'center', color: 'var(--text-secondary)', marginTop: 100 }}>
             <p>아직 게시된 글이 없습니다.</p>
@@ -101,7 +98,7 @@ export default async function Home() {
                     </div>
                   </div>
                   <div style={{ marginTop: 16, fontSize: '0.8rem', color: 'var(--text-tertiary)' }}>
-                    {new Date(note.createdAt).toLocaleDateString()}
+                    {formatDateKoreanShort(note.createdAt)}
                   </div>
                 </div>
               </Link>

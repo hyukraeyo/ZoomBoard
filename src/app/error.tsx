@@ -1,6 +1,9 @@
 'use client';
 
+const isDev = typeof process !== 'undefined' && process.env?.NODE_ENV === 'development';
+
 import { useEffect } from 'react';
+import Button from '@/components/common/Button';
 
 export default function Error({
     error,
@@ -10,7 +13,9 @@ export default function Error({
     reset: () => void;
 }) {
     useEffect(() => {
-        console.error(error);
+        if (isDev) {
+            console.error(error);
+        }
     }, [error]);
 
     return (
@@ -32,37 +37,12 @@ export default function Error({
                 죄송합니다. 요청하신 작업을 처리하는 동안 오류가 발생했습니다.
             </p>
             <div style={{ display: 'flex', gap: '12px' }}>
-                <button
-                    onClick={() => reset()}
-                    style={{
-                        padding: '10px 20px',
-                        background: 'var(--accent-primary)',
-                        color: 'white',
-                        border: 'none',
-                        borderRadius: '8px',
-                        cursor: 'pointer',
-                        fontWeight: '600',
-                        transition: 'opacity 0.2s'
-                    }}
-                    onMouseOver={(e) => e.currentTarget.style.opacity = '0.9'}
-                    onMouseOut={(e) => e.currentTarget.style.opacity = '1'}
-                >
+                <Button onClick={() => reset()} variant="primary">
                     다시 시도
-                </button>
-                <button
-                    onClick={() => window.location.href = '/'}
-                    style={{
-                        padding: '10px 20px',
-                        background: 'var(--bg-primary)',
-                        color: 'var(--text-primary)',
-                        border: '1px solid var(--border-primary)',
-                        borderRadius: '8px',
-                        cursor: 'pointer',
-                        fontWeight: '600'
-                    }}
-                >
+                </Button>
+                <Button onClick={() => window.location.href = '/'} variant="secondary">
                     홈으로 이동
-                </button>
+                </Button>
             </div>
         </div>
     );

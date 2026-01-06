@@ -1,7 +1,8 @@
 'use client';
 
 import { useNoteStore } from '@/store/useNoteStore';
-import { useEffect, useState } from 'react';
+import { useAuthStore } from '@/store/useAuthStore';
+import { useEffect, useState, useMemo } from 'react';
 import { Trash2, Undo2, Search } from 'lucide-react';
 import styles from './TrashPopover.module.css';
 
@@ -11,15 +12,18 @@ interface TrashPopoverProps {
 
 export default function TrashPopover({ position }: TrashPopoverProps) {
     const { trashNotes, fetchTrashNotes, restoreNote, permanentlyDeleteNote } = useNoteStore();
+    const { user } = useAuthStore();
     const [searchTerm, setSearchTerm] = useState('');
 
     useEffect(() => {
         fetchTrashNotes();
     }, [fetchTrashNotes]);
 
-    const filteredNotes = trashNotes.filter(note =>
-        (note.title || '새 페이지').toLowerCase().includes(searchTerm.toLowerCase())
-    );
+    const filteredNotes = useMemo(() => {
+        return trashNotes
+            .filter(note => user && note.userId === user.id) // 로그인한 사용자의 노트만 필터링
+            .filter(note => (note.title || '새 페이지').toLowerCase().includes(searchTerm.toLowerCase()));
+    }, [trashNotes, user, searchTerm]);
 
     const handleRestore = async (e: React.MouseEvent, id: string) => {
         e.stopPropagation();

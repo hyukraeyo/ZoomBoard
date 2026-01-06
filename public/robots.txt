@@ -1,0 +1,10 @@
+User-agent: *
+Allow: /
+
+# Disallow admin and API routes
+Disallow: /api/
+Disallow: /_next/
+Disallow: /login
+
+# Sitemap
+Sitemap: https://your-domain.com/sitemap.xml

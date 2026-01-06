@@ -68,9 +68,9 @@ export default function Sidebar({ initialIsOpen, initialIsLocked, initialNotes =
 
     const publishedNotes = useMemo(() => {
         return displayNotes
-            .filter(note => note.isPublished)
+            .filter(note => note.isPublished && (!user || note.userId === user.id))
             .sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
-    }, [displayNotes]);
+    }, [displayNotes, user]);
 
     const unpublishedNotes = useMemo(() => {
         return displayNotes
@@ -130,18 +130,29 @@ export default function Sidebar({ initialIsOpen, initialIsLocked, initialNotes =
         return () => window.removeEventListener('click', handleClickOutside);
     }, []);
 
-    // 현재 포커스된 노트의 제목 가져오기
+    // 현재 포커스된 노트의 제목 가져오기 - 깜빡임 방지
+    const [previousTitle, setPreviousTitle] = useState<string | null>('홈 (Home)');
+
     const currentNoteTitle = useMemo(() => {
-        if (pathname === '/') return '홈 (Home)';
-        if (!focusedNoteId || !pathname.startsWith('/notes/')) return null;
+        if (pathname === '/') {
+            setPreviousTitle('홈 (Home)');
+            return '홈 (Home)';
+        }
+
+        if (!focusedNoteId || !pathname.startsWith('/notes/')) {
+            return null;
+        }
 
         const note = notes.find(n => n.id === focusedNoteId);
-        // 노트가 아직 로드되지 않았으면(undefined) 아무것도 표시하지 않음 (깜빡임 방지)
-        if (!note) return null;
+        if (!note) {
+            // 노트가 아직 로드되지 않았으면 이전 제목 유지 (깜빡임 방지)
+            return previousTitle;
+        }
 
-        // 노트는 있는데 제목이 비어있으면 '새 페이지'
-        return note.title || '새 페이지';
-    }, [focusedNoteId, notes, pathname]);
+        const newTitle = note.title || '새 페이지';
+        setPreviousTitle(newTitle);
+        return newTitle;
+    }, [focusedNoteId, notes, pathname, previousTitle]);
 
     return (
         <>
@@ -302,49 +313,53 @@ export default function Sidebar({ initialIsOpen, initialIsLocked, initialNotes =
                     <span>홈 (Home)</span>
                 </div>
 
-                {/* 게시중인 페이지 (Published) */}
-                <div className={styles.sectionTitle} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                    <span>게시중인 페이지 (Published)</span>
-                </div>
-                <div className={styles.noteList}>
-                    {isLoading && publishedNotes.length === 0 ? (
-                        <>
-                            <div className={styles.skeletonItem}>
-                                <div className={`${styles.skeletonIcon} ${styles.skeleton}`} />
-                                <div className={`${styles.skeletonText} ${styles.skeleton}`} />
-                            </div>
-                            <div className={styles.skeletonItem}>
-                                <div className={`${styles.skeletonIcon} ${styles.skeleton}`} />
-                                <div className={`${styles.skeletonText} ${styles.skeleton}`} />
-                            </div>
-                        </>
-                    ) : (
-                        publishedNotes.map(note => (
-                            <div
-                                key={note.id}
-                                className={`${styles.noteItem} ${(focusedNoteId === note.id && pathname.startsWith('/notes/')) ? styles.active : ''} `}
-                                onClick={() => handleNoteClick(note.id)}
-                            >
-                                <FileText size={16} className={styles.icon} />
-                                <span style={{
-                                    whiteSpace: 'nowrap',
-                                    overflow: 'hidden',
-                                    textOverflow: 'ellipsis',
-                                    flex: 1,
-                                    minWidth: 0
-                                }}>
-                                    {note.title || '새 페이지'}
-                                </span>
-                                <div
-                                    className={styles.moreButton}
-                                    onClick={(e) => openMenu(e, note.id)}
-                                >
-                                    <MoreHorizontal size={14} />
-                                </div>
-                            </div>
-                        ))
-                    )}
-                </div>
+                {/* 게시중인 페이지 (Published) - 로그인한 사용자만 표시 */}
+                {user && (
+                    <>
+                        <div className={styles.sectionTitle} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                            <span>게시중인 페이지 (Published)</span>
+                        </div>
+                        <div className={styles.noteList}>
+                            {isLoading && publishedNotes.length === 0 ? (
+                                <>
+                                    <div className={styles.skeletonItem}>
+                                        <div className={`${styles.skeletonIcon} ${styles.skeleton}`} />
+                                        <div className={`${styles.skeletonText} ${styles.skeleton}`} />
+                                    </div>
+                                    <div className={styles.skeletonItem}>
+                                        <div className={`${styles.skeletonIcon} ${styles.skeleton}`} />
+                                        <div className={`${styles.skeletonText} ${styles.skeleton}`} />
+                                    </div>
+                                </>
+                            ) : (
+                                publishedNotes.map(note => (
+                                    <div
+                                        key={note.id}
+                                        className={`${styles.noteItem} ${(focusedNoteId === note.id && pathname.startsWith('/notes/')) ? styles.active : ''} `}
+                                        onClick={() => handleNoteClick(note.id)}
+                                    >
+                                        <FileText size={16} className={styles.icon} />
+                                        <span style={{
+                                            whiteSpace: 'nowrap',
+                                            overflow: 'hidden',
+                                            textOverflow: 'ellipsis',
+                                            flex: 1,
+                                            minWidth: 0
+                                        }}>
+                                            {note.title || '새 페이지'}
+                                        </span>
+                                        <div
+                                            className={styles.moreButton}
+                                            onClick={(e) => openMenu(e, note.id)}
+                                        >
+                                            <MoreHorizontal size={14} />
+                                        </div>
+                                    </div>
+                                ))
+                            )}
+                        </div>
+                    </>
+                )}
 
                 {/* 게시되지 않은 페이지 (Unpublished / Private) */}
                 {user && (
